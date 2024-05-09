@@ -24,9 +24,9 @@ func main() {
 
 	// Test the repository methods by creating a folder and retrieving it.
 	f := folder.Folder{
-		Name:    "Test",
-		Parent:  1,
-		OwnerID: 1,
+		Name:     "Test",
+		ParentId: 1,
+		OwnerID:  1,
 	}
 	err = r.CreateFolder(context.TODO(), &f)
 	if err != nil {

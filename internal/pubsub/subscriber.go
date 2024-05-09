@@ -1,3 +1,9 @@
 package pubsub
 
-// Publisher is the interface that defines the methods that a publisher must implement in CQRS pattern.
+import "github.com/go-kit/kit/endpoint"
+
+// Subscriber is the interface that defines the methods that a subscriber must implement in CQRS pattern.
+
+type Subscriber interface {
+	Subscribe(e endpoint.Endpoint) error
+}
