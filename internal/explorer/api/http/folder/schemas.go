@@ -1,4 +1,4 @@
-package api
+package folder
 
 // Request and response schemas for Folder entity in the API
 type (

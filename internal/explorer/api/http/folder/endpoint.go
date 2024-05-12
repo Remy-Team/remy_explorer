@@ -1,12 +1,11 @@
-package api
+package folder
 
 // Write endpooints with go-kit
 import (
 	"context"
 	"github.com/go-kit/kit/endpoint"
-	"remy_explorer/internal/explorer/service"
-	"remy_explorer/pkg/domain/folder"
-	"remy_explorer/pkg/domain/user"
+	folder2 "remy_explorer/internal/explorer/service/folder"
+	"remy_explorer/internal/explorer/service/user"
 )
 
 // Endpoints holds all Go kit endpoints for folder operations
@@ -20,7 +19,7 @@ type Endpoints struct {
 }
 
 // MakeEndpoints initializes all Go kit endpoints for folder operations
-func MakeEndpoints(s service.Service) Endpoints {
+func MakeEndpoints(s folder2.Service) Endpoints {
 	return Endpoints{
 		CreateFolder:         makeCreateFolderEndpoint(s),
 		GetFolderByID:        makeGetFolderByIDEndpoint(s),
@@ -30,23 +29,23 @@ func MakeEndpoints(s service.Service) Endpoints {
 	}
 }
 
-func makeCreateFolderEndpoint(s service.Service) endpoint.Endpoint {
+func makeCreateFolderEndpoint(s folder2.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreateFolderRequest)
-		f := folder.Folder{
+		f := folder2.Folder{
 			Name:     req.Name,
 			OwnerID:  user.ID(req.OwnerID),
-			ParentID: folder.FolderID(req.ParentID),
+			ParentID: folder2.FolderID(req.ParentID),
 		}
 		id, err := s.CreateFolder(ctx, &f)
 		return CreateFolderResponse{id.ToInt64()}, err
 	}
 }
 
-func makeGetFolderByIDEndpoint(s service.Service) endpoint.Endpoint {
+func makeGetFolderByIDEndpoint(s folder2.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetFolderByIDRequest)
-		f, err := s.GetFolderByID(ctx, folder.FolderID(req.ID))
+		f, err := s.GetFolderByID(ctx, folder2.FolderID(req.ID))
 		return GetFolderByIDResponse{
 			ID:        f.ID.ToInt64(),
 			OwnerID:   string(f.OwnerID),
@@ -58,10 +57,10 @@ func makeGetFolderByIDEndpoint(s service.Service) endpoint.Endpoint {
 	}
 }
 
-func makeGetFoldersByParentIDEndpoint(s service.Service) endpoint.Endpoint {
+func makeGetFoldersByParentIDEndpoint(s folder2.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetFoldersByParentIDRequest)
-		folders, err := s.GetFoldersByParentID(ctx, folder.FolderID(req.ParentID))
+		folders, err := s.GetFoldersByParentID(ctx, folder2.FolderID(req.ParentID))
 		if err != nil {
 			return nil, err
 		}
@@ -77,25 +76,25 @@ func makeGetFoldersByParentIDEndpoint(s service.Service) endpoint.Endpoint {
 	}
 }
 
-func makeUpdateFolderEndpoint(s service.Service) endpoint.Endpoint {
+func makeUpdateFolderEndpoint(s folder2.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateFolderRequest)
-		f := folder.Folder{
-			ID:       folder.FolderID(req.ID),
+		f := folder2.Folder{
+			ID:       folder2.FolderID(req.ID),
 			Name:     req.Name,
-			ParentID: folder.FolderID(req.ParentID),
+			ParentID: folder2.FolderID(req.ParentID),
 		}
 		err := s.UpdateFolder(ctx, &f)
-		return UpdateFolderResponse{Ok: true}, err // TODO: replace  true with returned value
+		return UpdateFolderResponse{Ok: err == nil}, err // TODO: replace true with returned value
 	}
 
 }
 
-func makeDeleteFolderEndpoint(s service.Service) endpoint.Endpoint {
+func makeDeleteFolderEndpoint(s folder2.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteFolderRequest)
-		err := s.DeleteFolder(ctx, folder.FolderID(req.ID))
-		return DeleteFolderResponse{Ok: true}, err //TODO: replace true with returned value
+		err := s.DeleteFolder(ctx, folder2.FolderID(req.ID))
+		return DeleteFolderResponse{Ok: err == nil}, err //TODO: replace true with returned value
 	}
 
 }

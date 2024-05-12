@@ -17,22 +17,18 @@
 package file
 
 import (
-	"remy_explorer/pkg/domain/folder"
-	"remy_explorer/pkg/domain/user"
 	"time"
 )
 
-type FileID int64
-
 type File struct {
-	ID         FileID          `json:"id"`
-	OwnerID    user.ID         `json:"owner"`
-	Name       string          `json:"name"`
-	FolderID   folder.FolderID `json:"folder"`
-	ObjectPath string          `json:"object_path"`
-	Size       int             `json:"size"`
-	Type       string          `json:"type"`
-	CreatedAt  time.Time       `json:"created_at"`
-	UpdatedAt  time.Time       `json:"updated_at"`
-	Tags       []string        `json:"tags"`
+	ID         int64     `json:"id"`
+	OwnerID    string    `json:"owner"`
+	Name       string    `json:"name"`
+	FolderID   int64     `json:"folder"`
+	ObjectPath string    `json:"object_path"`
+	Size       int       `json:"size"`
+	Type       string    `json:"type"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	Tags       []string  `json:"tags"`
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"log"
 	"remy_explorer/internal/config"
-	"remy_explorer/pkg/utils"
+	"remy_explorer/internal/utils"
 	"time"
 )
 
