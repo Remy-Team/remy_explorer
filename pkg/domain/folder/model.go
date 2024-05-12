@@ -19,6 +19,10 @@ import (
 
 type FolderID int64
 
+func (i FolderID) ToInt64() int64 {
+	return int64(i)
+}
+
 type Folder struct {
 	ID        FolderID  `json:"id"`
 	OwnerID   user.ID   `json:"owner_id"`

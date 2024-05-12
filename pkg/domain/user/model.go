@@ -1,6 +1,6 @@
 package user
 
-type ID int64
+type ID string
 
 type User struct {
 	ID ID `json:"id"`
