@@ -75,7 +75,7 @@ func makeGetFilesByParentIDEndpoint(s file.Service) endpoint.Endpoint {
 			}
 		}
 		return GetFilesByFolderIDResponse{
-			lenght: length,
+			length: length,
 			Files:  shortFiles,
 		}, err
 	}

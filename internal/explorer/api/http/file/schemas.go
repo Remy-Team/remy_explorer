@@ -36,7 +36,7 @@ type (
 	}
 
 	GetFilesByFolderIDResponse struct {
-		lenght int
+		length int
 		Files  []ShortFileInfo `json:"files"`
 	}
 	UpdateFileRequest struct {
