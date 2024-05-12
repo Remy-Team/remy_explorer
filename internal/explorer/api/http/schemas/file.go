@@ -1,4 +1,4 @@
-package file
+package schemas
 
 type (
 	CreateFileRequest struct {
@@ -36,7 +36,7 @@ type (
 	}
 
 	GetFilesByFolderIDResponse struct {
-		length int
+		Length int
 		Files  []ShortFileInfo `json:"files"`
 	}
 	UpdateFileRequest struct {

@@ -1,35 +1,15 @@
-package file
+package http
 
 import (
 	"context"
 	"github.com/go-kit/kit/endpoint"
+	file2 "remy_explorer/internal/explorer/api/http/schemas"
 	"remy_explorer/internal/explorer/service/file"
 )
 
-// Endpoints holds all Go kit endpoints for file operations
-type Endpoints struct {
-	// For files
-	CreateFile         endpoint.Endpoint
-	GetFileByID        endpoint.Endpoint
-	GetFilesByParentID endpoint.Endpoint
-	UpdateFile         endpoint.Endpoint
-	DeleteFile         endpoint.Endpoint
-}
-
-// MakeEndpoints initializes all Go kit endpoints for file operations
-func MakeEndpoints(s file.Service) Endpoints {
-	return Endpoints{
-		CreateFile:         makeCreateFileEndpoint(s),
-		GetFileByID:        makeGetFileByIDEndpoint(s),
-		GetFilesByParentID: makeGetFilesByParentIDEndpoint(s),
-		UpdateFile:         makeUpdateFileEndpoint(s),
-		DeleteFile:         makeDeleteFileEndpoint(s),
-	}
-}
-
 func makeCreateFileEndpoint(s file.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(CreateFileRequest)
+		req := request.(file2.CreateFileRequest)
 		f := file.File{
 			Name:       req.Name,
 			FolderID:   req.FolderID,
@@ -39,15 +19,15 @@ func makeCreateFileEndpoint(s file.Service) endpoint.Endpoint {
 			ObjectPath: req.Path,
 		}
 		id, err := s.CreateFile(ctx, &f)
-		return CreateFileResponse{ID: *id}, err
+		return file2.CreateFileResponse{ID: *id}, err
 	}
 }
 
 func makeGetFileByIDEndpoint(s file.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(GetFileByIDRequest)
+		req := request.(file2.GetFileByIDRequest)
 		f, err := s.GetFileByID(ctx, req.ID)
-		return GetFileByIDResponse{
+		return file2.GetFileByIDResponse{
 			ID:        f.ID,
 			Name:      f.Name,
 			FolderID:  f.FolderID,
@@ -63,19 +43,19 @@ func makeGetFileByIDEndpoint(s file.Service) endpoint.Endpoint {
 
 func makeGetFilesByParentIDEndpoint(s file.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(GetFilesByFolderIDRequest)
+		req := request.(file2.GetFilesByFolderIDRequest)
 		files, err := s.GetFilesByFolderID(ctx, req.FolderID)
 		length := len(files) // Used two times
-		shortFiles := make([]ShortFileInfo, length)
+		shortFiles := make([]file2.ShortFileInfo, length)
 		for i, f := range files {
-			shortFiles[i] = ShortFileInfo{
+			shortFiles[i] = file2.ShortFileInfo{
 				ID:   f.ID,
 				Name: f.Name,
 				Type: f.Type,
 			}
 		}
-		return GetFilesByFolderIDResponse{
-			length: length,
+		return file2.GetFilesByFolderIDResponse{
+			Length: length,
 			Files:  shortFiles,
 		}, err
 	}
@@ -83,21 +63,21 @@ func makeGetFilesByParentIDEndpoint(s file.Service) endpoint.Endpoint {
 
 func makeUpdateFileEndpoint(s file.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(UpdateFileRequest)
+		req := request.(file2.UpdateFileRequest)
 		f := file.File{
 			ID:       req.ID,
 			Name:     req.Name,
 			FolderID: req.FolderID,
 		}
 		ok, err := s.UpdateFile(ctx, &f)
-		return UpdateFileResponse{Ok: ok}, err
+		return file2.UpdateFileResponse{Ok: ok}, err
 	}
 }
 
 func makeDeleteFileEndpoint(s file.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(DeleteFileRequest)
+		req := request.(file2.DeleteFileRequest)
 		ok, err := s.DeleteFile(ctx, req.ID)
-		return DeleteFileResponse{Ok: ok}, err
+		return file2.DeleteFileResponse{Ok: ok}, err
 	}
 }
