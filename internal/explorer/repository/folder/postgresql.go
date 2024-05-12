@@ -4,25 +4,27 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/jackc/pgconn"
-	"remy_explorer/pkg/logging"
 	"remy_explorer/pkg/postgresql"
 )
 
 type repository struct {
 	client postgresql.Client
-	logger *logging.Logger
+	log    log.Logger
 }
 
 // CreateFolder creates a new folder in the database.
 func (r repository) CreateFolder(ctx context.Context, folder *FolderDTO) error {
+	logger := log.With(r.log, "folder", "CreateFolder")
 	q := `INSERT INTO public.folder (name, parent_id, owner_id) VALUES ($1, $2, $3) RETURNING id`
 	if err := r.client.QueryRow(ctx, q, folder.Name, folder.ParentID, folder.OwnerID).Scan(&folder.ID); err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf("SQL Error: %s, Details: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
+			level.Error(logger).Log("err", newErr)
 			return nil
 		}
 		return err
@@ -39,8 +41,7 @@ func (r repository) GetFolderByID(ctx context.Context, id FolderDTOID) (*FolderD
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf("SQL Error: %s, Details: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return nil, nil
+			return nil, newErr
 		}
 		return nil, err
 	}
@@ -56,8 +57,7 @@ func (r repository) GetFoldersByParentID(ctx context.Context, parentID FolderDTO
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf("SQL Error: %s, Details: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return nil, nil
+			return nil, newErr
 		}
 		return nil, err
 	}
@@ -82,8 +82,7 @@ func (r repository) UpdateFolder(ctx context.Context, folder *FolderDTO) error {
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf("SQL Error: %s, Details: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return nil
+			return newErr
 		}
 		return err
 	}
@@ -99,8 +98,7 @@ func (r repository) DeleteFolder(ctx context.Context, id FolderDTOID) error {
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf("SQL Error: %s, Details: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return nil
+			return newErr
 		}
 		return err
 	}
@@ -108,9 +106,9 @@ func (r repository) DeleteFolder(ctx context.Context, id FolderDTOID) error {
 }
 
 // New creates a new folder repository.
-func New(client postgresql.Client, logger *logging.Logger) repository {
+func New(client postgresql.Client, logger log.Logger) repository {
 	return repository{
 		client: client,
-		logger: logger,
+		log:    log.With(logger, "repository", "folder"),
 	}
 }

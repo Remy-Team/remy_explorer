@@ -1,17 +1,18 @@
 package file
 
+//TODO: Change error type to custom error type for SQL errors
 import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-kit/log"
 	"github.com/jackc/pgconn"
-	"remy_explorer/pkg/logging"
 	"remy_explorer/pkg/postgresql"
 )
 
 type repository struct {
 	client postgresql.Client
-	logger *logging.Logger
+	logger log.Logger
 }
 
 func (r repository) GetFilesByFolderIdSorted(ctx context.Context, folderID FileDTOID, sortOption *SortOption) ([]*FileDTO, error) {
@@ -23,8 +24,7 @@ func (r repository) GetFilesByFolderIdSorted(ctx context.Context, folderID FileD
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf("SQL Error: %s, Details: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return nil, nil
+			return nil, newErr
 		}
 		return nil, err
 
@@ -50,8 +50,7 @@ func (r repository) CreateFile(ctx context.Context, file *FileDTO) error {
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf("SQL Error: %s, Details: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return nil
+			return newErr
 		}
 		return err
 	}
@@ -67,8 +66,7 @@ func (r repository) GetFileByID(ctx context.Context, id FileDTOID) (*FileDTO, er
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf("SQL Error: %s, Details: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return nil, nil
+			return nil, newErr
 		}
 		return nil, err
 	}
@@ -103,8 +101,7 @@ func (r repository) UpdateFile(ctx context.Context, file *FileDTO) error {
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf("SQL Error: %s, Details: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return nil
+			return newErr
 		}
 		return err
 	}
@@ -119,8 +116,7 @@ func (r repository) DeleteFile(ctx context.Context, id FileDTOID) error {
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf("SQL Error: %s, Details: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState())
-			r.logger.Error(newErr)
-			return nil
+			return newErr
 		}
 		return err
 	}
@@ -128,9 +124,9 @@ func (r repository) DeleteFile(ctx context.Context, id FileDTOID) error {
 }
 
 // New creates a new repository.
-func New(client postgresql.Client, logger *logging.Logger) Repository {
+func New(client postgresql.Client, logger log.Logger) Repository {
 	return repository{
 		client: client,
-		logger: logger,
+		logger: log.With(logger, "repository", "file"),
 	}
 }
