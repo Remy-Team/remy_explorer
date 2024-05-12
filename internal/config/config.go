@@ -1,8 +1,8 @@
 package config
 
 import (
+	"github.com/go-kit/log"
 	"github.com/ilyakaznacheev/cleanenv"
-	"remy_explorer/pkg/logging"
 	"sync"
 )
 
@@ -30,20 +30,23 @@ var instance *Config
 var once sync.Once
 
 // GetConfig reads the application configuration from the default path.
-func GetConfig() *Config {
-	return GetConfigWithPath("config.yml")
+func GetConfig(log log.Logger) *Config {
+	return GetConfigWithPath(log, "config.yml")
 }
 
 // GetConfigWithPath reads the application configuration from a given path.
-func GetConfigWithPath(path string) *Config {
+func GetConfigWithPath(logger log.Logger, path string) *Config {
 	once.Do(func() {
-		logger := logging.GetLogger()
-		logger.Info("read application configuration")
+		logger := log.With(logger, "method", "GetConfig")
+		logger.Log("message", "Reading configuration from", "path", path)
 		instance = &Config{}
 		if err := cleanenv.ReadConfig(path, instance); err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
-			logger.Info(help)
-			logger.Fatal(err)
+			logger.Log("message", "Failed to read configuration", "error", err, "help", help)
+			//Fatal error, as the application cannot start without a valid configuration
+			panic(err)
+		} else {
+			logger.Log("message", "Configuration read successfully")
 		}
 	})
 	return instance
