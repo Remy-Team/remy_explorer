@@ -24,7 +24,7 @@ import (
 
 // NewHTTPServer @host localhost:8080
 //
-//	@BasePath	/api/v1
+//	@BasePath	/
 //
 // NewHTTPServer creates a new HTTP server and registers all endpoints
 func NewHTTPServer(endpoints Endpoints) http.Handler {
@@ -32,10 +32,7 @@ func NewHTTPServer(endpoints Endpoints) http.Handler {
 	r.Use(commonMiddleware)
 
 	// Swagger UI
-	r.Methods("GET").Path("/swagger").Handler(httpSwagger.WrapHandler)
-
-	// Redirect to Swagger UI
-	r.Methods("GET").Path("/").Handler(http.RedirectHandler("/swagger/index.html", http.StatusTemporaryRedirect))
+	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	//	@Summary		Create a new file
 	//	@Description	Create a new file in the system

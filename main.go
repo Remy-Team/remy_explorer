@@ -20,7 +20,7 @@ import (
 //	@title				Remy Explorer API
 //	@version			1.0
 //	@description		This is a file and folder explorer API
-//	@BasePath			/api/v1
+//	@BasePath			/
 //	@host				localhost:1234
 //	@schemes			http
 //	@produce			json
