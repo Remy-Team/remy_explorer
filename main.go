@@ -1,4 +1,4 @@
-package remy_explorer
+package main
 
 import (
 	"context"
