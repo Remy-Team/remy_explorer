@@ -1,0 +1,517 @@
+basePath: /api/v1
+definitions:
+  schemas.CreateFileRequest:
+    properties:
+      folder_id:
+        description: ID of the parent folder
+        type: integer
+      name:
+        description: Name of the file
+        type: string
+      owner_id:
+        description: ID of the owner
+        type: string
+      path:
+        description: Path where the file is stored
+        type: string
+      size:
+        description: Size of the file
+        type: integer
+      type:
+        description: Type of the file
+        type: string
+    required:
+    - name
+    type: object
+  schemas.CreateFileResponse:
+    properties:
+      id:
+        description: ID of the created file
+        type: integer
+    type: object
+  schemas.CreateFolderRequest:
+    properties:
+      name:
+        description: Name of the folder
+        type: string
+      owner_id:
+        description: ID of the owner
+        type: string
+      parent_id:
+        description: ID of the parent folder
+        type: integer
+    required:
+    - name
+    type: object
+  schemas.CreateFolderResponse:
+    properties:
+      id:
+        description: ID of the created folder
+        type: integer
+    type: object
+  schemas.DeleteFileResponse:
+    properties:
+      ok:
+        description: Indicates whether the deletion was successful
+        type: boolean
+    type: object
+  schemas.DeleteFolderResponse:
+    properties:
+      ok:
+        description: Indicates whether the deletion was successful
+        type: boolean
+    type: object
+  schemas.ErrorResponse:
+    description: Represents a standard error response for the API
+    properties:
+      code:
+        description: Error code
+        type: integer
+      message:
+        description: Error message
+        type: string
+    type: object
+  schemas.GetFileByIDResponse:
+    properties:
+      created_at:
+        description: Timestamp when the file was created
+        type: string
+      folder_id:
+        description: ID of the parent folder
+        type: integer
+      id:
+        description: ID of the file
+        type: integer
+      name:
+        description: Name of the file
+        type: string
+      path:
+        description: Path where the file is stored
+        type: string
+      size:
+        description: Size of the file
+        type: integer
+      tags:
+        description: Tags associated with the file
+        items:
+          type: string
+        type: array
+      type:
+        description: Type of the file
+        type: string
+      updated_at:
+        description: Timestamp when the file was last updated
+        type: string
+    type: object
+  schemas.GetFilesByFolderIDResponse:
+    properties:
+      files:
+        description: List of files
+        items:
+          $ref: '#/definitions/schemas.ShortFileInfo'
+        type: array
+      length:
+        description: Number of files
+        type: integer
+    type: object
+  schemas.GetFolderByIDResponse:
+    properties:
+      created_at:
+        description: Timestamp when the folder was created
+        type: string
+      id:
+        description: ID of the folder
+        type: integer
+      name:
+        description: Name of the folder
+        type: string
+      owner_id:
+        description: ID of the owner
+        type: string
+      parent_id:
+        description: ID of the parent folder
+        type: integer
+      updated_at:
+        description: Timestamp when the folder was last updated
+        type: string
+    type: object
+  schemas.GetFoldersByParentIDResponse:
+    properties:
+      id:
+        description: ID of the folder
+        type: integer
+      name:
+        description: Name of the folder
+        type: string
+    type: object
+  schemas.ShortFileInfo:
+    properties:
+      id:
+        description: ID of the file
+        type: integer
+      name:
+        description: Name of the file
+        type: string
+      type:
+        description: Type of the file
+        type: string
+    type: object
+  schemas.UpdateFileRequest:
+    properties:
+      folder_id:
+        description: New parent folder ID
+        type: integer
+      id:
+        description: ID of the file to update
+        type: integer
+      name:
+        description: New name of the file
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  schemas.UpdateFileResponse:
+    properties:
+      ok:
+        description: Indicates whether the update was successful
+        type: boolean
+    type: object
+  schemas.UpdateFolderRequest:
+    properties:
+      id:
+        description: ID of the folder to update
+        type: integer
+      name:
+        description: New name of the folder
+        type: string
+      parent_id:
+        description: New parent folder ID
+        type: integer
+    required:
+    - id
+    - name
+    type: object
+  schemas.UpdateFolderResponse:
+    properties:
+      ok:
+        description: Indicates whether the update was successful
+        type: boolean
+    type: object
+host: localhost:1234
+info:
+  contact:
+    email: remystorage@yandex.ru
+    name: Remy Explorer
+  description: This is a file and folder explorer API
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+  title: Remy Explorer API
+  version: "1.0"
+paths:
+  /files:
+    post:
+      consumes:
+      - application/json
+      description: Create a new file in the system
+      parameters:
+      - description: Create File Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateFileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.CreateFileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Create a new file
+      tags:
+      - files
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing file
+      parameters:
+      - description: Update File Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateFileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UpdateFileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Update a file
+      tags:
+      - files
+  /files/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a file by its ID
+      parameters:
+      - description: File ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.DeleteFileResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Delete a file
+      tags:
+      - files
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a file's details by its ID
+      parameters:
+      - description: File ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.GetFileByIDResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get file by ID
+      tags:
+      - files
+  /folders:
+    post:
+      consumes:
+      - application/json
+      description: Create a new folder in the system
+      parameters:
+      - description: Create Folder Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateFolderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.CreateFolderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Create a new folder
+      tags:
+      - folders
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing folder
+      parameters:
+      - description: Update Folder Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateFolderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UpdateFolderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Update a folder
+      tags:
+      - folders
+  /folders/{folderID}/files:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of files in a specific folder
+      parameters:
+      - description: Folder ID
+        in: path
+        name: folderID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.GetFilesByFolderIDResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get files by folder ID
+      tags:
+      - files
+  /folders/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a folder by its ID
+      parameters:
+      - description: Folder ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.DeleteFolderResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Delete a folder
+      tags:
+      - folders
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a folder's details by its ID
+      parameters:
+      - description: Folder ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.GetFolderByIDResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get folder by ID
+      tags:
+      - folders
+  /folders/{parentID}/subfolders:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of folders within a specific parent folder
+      parameters:
+      - description: Parent Folder ID
+        in: path
+        name: parentID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.GetFoldersByParentIDResponse'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get folders by parent ID
+      tags:
+      - folders
+produces:
+- application/json
+schemes:
+- http
+swagger: "2.0"
