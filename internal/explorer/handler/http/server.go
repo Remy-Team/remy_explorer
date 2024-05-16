@@ -32,7 +32,9 @@ func NewHTTPServer(endpoints Endpoints) http.Handler {
 	r.Use(commonMiddleware)
 
 	// Swagger UI
-	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+	r.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
+	// Redirect to Swagger UI
+	r.PathPrefix("/").Handler(http.RedirectHandler("/swagger/index.html", http.StatusFound))
 
 	//	@Summary		Create a new file
 	//	@Description	Create a new file in the system
