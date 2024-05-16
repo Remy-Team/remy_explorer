@@ -1,56 +1,74 @@
 package schemas
 
-type (
-	CreateFileRequest struct {
-		Name     string `json:"name" validate:"required"`
-		Type     string `json:"type"`
-		FolderID int64  `json:"folder_id"`
-		OwnerID  string `json:"owner_id"`
-		Path     string `json:"path"`
-		Size     int
-	}
-	CreateFileResponse struct {
-		ID int64 `json:"id"`
-	}
-	GetFileByIDRequest struct {
-		ID int64 `json:"id" validate:"required"`
-	}
-	GetFileByIDResponse struct {
-		ID        int64    `json:"id"`
-		Name      string   `json:"name"`
-		Type      string   `json:"type"`
-		Size      int      `json:"size"`
-		FolderID  int64    `json:"folder_id"`
-		Path      string   `json:"path"`
-		CreatedAt string   `json:"created_at"`
-		UpdatedAt string   `json:"updated_at"`
-		Tags      []string `json:"tags"`
-	}
-	GetFilesByFolderIDRequest struct {
-		FolderID int64 `json:"folder_id" validate:"required"`
-	}
-	ShortFileInfo struct {
-		ID   int64  `json:"id"`
-		Name string `json:"name"`
-		Type string `json:"type"`
-	}
+// CreateFileRequest represents the request to create a new file
+type CreateFileRequest struct {
+	Name     string `json:"name" validate:"required"` // Name of the file
+	Type     string `json:"type"`                     // Type of the file
+	FolderID int64  `json:"folder_id"`                // ID of the parent folder
+	OwnerID  string `json:"owner_id"`                 // ID of the owner
+	Path     string `json:"path"`                     // Path where the file is stored
+	Size     int    `json:"size"`                     // Size of the file
+}
 
-	GetFilesByFolderIDResponse struct {
-		Length int
-		Files  []ShortFileInfo `json:"files"`
-	}
-	UpdateFileRequest struct {
-		ID       int64  `json:"id" validate:"required"`
-		Name     string `json:"name" validate:"required"`
-		FolderID int64  `json:"folder_id"`
-	}
-	UpdateFileResponse struct {
-		Ok bool `json:"ok"`
-	}
-	DeleteFileRequest struct {
-		ID int64 `json:"id" validate:"required"`
-	}
-	DeleteFileResponse struct {
-		Ok bool `json:"ok"`
-	}
-)
+// CreateFileResponse represents the response after creating a new file
+type CreateFileResponse struct {
+	ID int64 `json:"id"` // ID of the created file
+}
+
+// GetFileByIDRequest represents the request to get a file by its ID
+type GetFileByIDRequest struct {
+	ID int64 `json:"id" validate:"required"` // ID of the file to retrieve
+}
+
+// GetFileByIDResponse represents the response with the details of a file
+type GetFileByIDResponse struct {
+	ID        int64    `json:"id"`         // ID of the file
+	Name      string   `json:"name"`       // Name of the file
+	Type      string   `json:"type"`       // Type of the file
+	Size      int      `json:"size"`       // Size of the file
+	FolderID  int64    `json:"folder_id"`  // ID of the parent folder
+	Path      string   `json:"path"`       // Path where the file is stored
+	CreatedAt string   `json:"created_at"` // Timestamp when the file was created
+	UpdatedAt string   `json:"updated_at"` // Timestamp when the file was last updated
+	Tags      []string `json:"tags"`       // Tags associated with the file
+}
+
+// GetFilesByFolderIDRequest represents the request to get files by folder ID
+type GetFilesByFolderIDRequest struct {
+	FolderID int64 `json:"folder_id" validate:"required"` // ID of the parent folder
+}
+
+// ShortFileInfo represents a short version of file information
+type ShortFileInfo struct {
+	ID   int64  `json:"id"`   // ID of the file
+	Name string `json:"name"` // Name of the file
+	Type string `json:"type"` // Type of the file
+}
+
+// GetFilesByFolderIDResponse represents the response with the list of files in a folder
+type GetFilesByFolderIDResponse struct {
+	Length int             `json:"length"` // Number of files
+	Files  []ShortFileInfo `json:"files"`  // List of files
+}
+
+// UpdateFileRequest represents the request to update a file
+type UpdateFileRequest struct {
+	ID       int64  `json:"id" validate:"required"`   // ID of the file to update
+	Name     string `json:"name" validate:"required"` // New name of the file
+	FolderID int64  `json:"folder_id"`                // New parent folder ID
+}
+
+// UpdateFileResponse represents the response after updating a file
+type UpdateFileResponse struct {
+	Ok bool `json:"ok"` // Indicates whether the update was successful
+}
+
+// DeleteFileRequest represents the request to delete a file
+type DeleteFileRequest struct {
+	ID int64 `json:"id" validate:"required"` // ID of the file to delete
+}
+
+// DeleteFileResponse represents the response after deleting a file
+type DeleteFileResponse struct {
+	Ok bool `json:"ok"` // Indicates whether the deletion was successful
+}

@@ -17,6 +17,20 @@ import (
 	"syscall"
 )
 
+//	@title				Remy Explorer API
+//	@version			1.0
+//	@description		This is a file and folder explorer API
+//	@BasePath			/api/v1
+//	@host				localhost:1234
+//	@schemes			http
+//	@produce			json
+//	@consumes			json
+
+//	@contact.name				Remy Explorer
+//	@contact.email				remystorage@yandex.ru
+//	@license.name				MIT
+//	@license.url				http://opensource.org/licenses/MIT
+
 func main() {
 	var logger log.Logger
 	{
