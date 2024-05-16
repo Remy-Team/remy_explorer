@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/signal"
 	"remy_explorer/internal/config"
-	"remy_explorer/internal/explorer/domain"
 	handler "remy_explorer/internal/explorer/handler/http"
 	repo "remy_explorer/internal/explorer/repository/postgresql"
 	"remy_explorer/internal/explorer/service/file"
@@ -39,12 +38,12 @@ func main() {
 	flag.Parse()
 
 	// Create file service
-	var fileSvc domain.FileService
+	var fileSvc file.FileService
 	{
 		rep := repo.NewFileRepo(pool, logger)
 		fileSvc = file.NewService(rep, logger)
 	}
-	var folderSvc domain.FolderService
+	var folderSvc folder.FolderService
 	{
 		rep := repo.NewFolderRepo(pool, logger)
 		folderSvc = folder.NewService(rep, logger)
@@ -61,8 +60,8 @@ func main() {
 
 	go func() {
 		fmt.Println("Listening on", cfg.Listen)
-		handler := handler.NewHTTPServer(endpoints)
-		errs <- http.ListenAndServe(cfg.Listen.BindIP+":"+cfg.Listen.Port, handler)
+		httpHandler := handler.NewHTTPServer(endpoints)
+		errs <- http.ListenAndServe(cfg.Listen.BindIP+":"+cfg.Listen.Port, httpHandler)
 	}()
 	level.Error(logger).Log("exit", <-errs)
 }

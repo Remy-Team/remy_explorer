@@ -5,9 +5,10 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"remy_explorer/internal/explorer/domain"
 	"remy_explorer/internal/explorer/handler/http/schemas"
+	"remy_explorer/internal/explorer/service/folder"
 )
 
-func makeCreateFolderEndpoint(s domain.FolderService) endpoint.Endpoint {
+func makeCreateFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(schemas.CreateFolderRequest)
 		f := domain.Folder{
@@ -20,7 +21,7 @@ func makeCreateFolderEndpoint(s domain.FolderService) endpoint.Endpoint {
 	}
 }
 
-func makeGetFolderByIDEndpoint(s domain.FolderService) endpoint.Endpoint {
+func makeGetFolderByIDEndpoint(s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(schemas.GetFolderByIDRequest)
 		f, err := s.GetFolderByID(ctx, req.ID)
@@ -35,7 +36,7 @@ func makeGetFolderByIDEndpoint(s domain.FolderService) endpoint.Endpoint {
 	}
 }
 
-func makeGetFoldersByParentIDEndpoint(s domain.FolderService) endpoint.Endpoint {
+func makeGetFoldersByParentIDEndpoint(s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(schemas.GetFoldersByParentIDRequest)
 		folders, err := s.GetFoldersByParentID(ctx, req.ParentID)
@@ -54,7 +55,7 @@ func makeGetFoldersByParentIDEndpoint(s domain.FolderService) endpoint.Endpoint 
 	}
 }
 
-func makeUpdateFolderEndpoint(s domain.FolderService) endpoint.Endpoint {
+func makeUpdateFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(schemas.UpdateFolderRequest)
 		f := domain.Folder{
@@ -68,7 +69,7 @@ func makeUpdateFolderEndpoint(s domain.FolderService) endpoint.Endpoint {
 
 }
 
-func makeDeleteFolderEndpoint(s domain.FolderService) endpoint.Endpoint {
+func makeDeleteFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(schemas.DeleteFolderRequest)
 		err := s.DeleteFolder(ctx, req.ID)

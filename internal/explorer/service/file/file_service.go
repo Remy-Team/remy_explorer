@@ -4,16 +4,25 @@ import (
 	"context"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	model "remy_explorer/internal/explorer/domain"
+	"remy_explorer/internal/explorer/domain"
 	"remy_explorer/internal/explorer/dto"
 )
+
+// FileService provides file operations
+type FileService interface {
+	CreateFile(ctx context.Context, f *domain.File) (*int64, error)
+	GetFileByID(ctx context.Context, id int64) (*domain.File, error)
+	GetFilesByFolderID(ctx context.Context, parentID int64) ([]*domain.File, error)
+	UpdateFile(ctx context.Context, f *domain.File) (bool, error)
+	DeleteFile(ctx context.Context, id int64) (bool, error)
+}
 
 type service struct {
 	repo dto.FileRepository
 	log  log.Logger
 }
 
-func (s service) CreateFile(ctx context.Context, f *model.File) (*int64, error) {
+func (s service) CreateFile(ctx context.Context, f *domain.File) (*int64, error) {
 	logger := log.With(s.log, "folder", "UpdateFolder")
 	fileDTO := dto.FileToDTO(f)
 	id, err := s.repo.CreateFile(ctx, &fileDTO)
@@ -25,7 +34,7 @@ func (s service) CreateFile(ctx context.Context, f *model.File) (*int64, error) 
 	return id, nil
 }
 
-func (s service) GetFileByID(ctx context.Context, id int64) (*model.File, error) {
+func (s service) GetFileByID(ctx context.Context, id int64) (*domain.File, error) {
 	logger := log.With(s.log, "folder", "GetFolderByID")
 	fileDTO, err := s.repo.GetFileByID(ctx, id)
 	if err != nil {
@@ -37,14 +46,14 @@ func (s service) GetFileByID(ctx context.Context, id int64) (*model.File, error)
 	return file, nil
 }
 
-func (s service) GetFilesByFolderID(ctx context.Context, parentID int64) ([]*model.File, error) {
+func (s service) GetFilesByFolderID(ctx context.Context, parentID int64) ([]*domain.File, error) {
 	logger := log.With(s.log, "folder", "GetFoldersByParentID")
 	fileDTOs, err := s.repo.GetFilesByFolderID(ctx, parentID)
 	if err != nil {
 		level.Error(logger).Log("err", err)
 		return nil, err
 	}
-	files := make([]*model.File, len(fileDTOs))
+	files := make([]*domain.File, len(fileDTOs))
 	for i, f := range fileDTOs {
 		files[i] = f.ToDomain()
 	}
@@ -52,7 +61,7 @@ func (s service) GetFilesByFolderID(ctx context.Context, parentID int64) ([]*mod
 	return files, nil
 }
 
-func (s service) UpdateFile(ctx context.Context, f *model.File) (bool, error) {
+func (s service) UpdateFile(ctx context.Context, f *domain.File) (bool, error) {
 	logger := log.With(s.log, "folder", "UpdateFolder")
 	fileDTO := dto.FileToDTO(f)
 	if err := s.repo.UpdateFile(ctx, &fileDTO); err != nil {
@@ -73,7 +82,7 @@ func (s service) DeleteFile(ctx context.Context, id int64) (bool, error) {
 	return true, nil
 }
 
-func NewService(repo dto.FileRepository, logger log.Logger) model.FileService {
+func NewService(repo dto.FileRepository, logger log.Logger) FileService {
 	return &service{
 		repo: repo,
 		log:  log.With(logger, "service", "file"),

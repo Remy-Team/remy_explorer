@@ -8,6 +8,14 @@ import (
 	"remy_explorer/internal/explorer/dto"
 )
 
+type FolderService interface {
+	CreateFolder(ctx context.Context, folder *domain.Folder) (*int64, error)
+	GetFolderByID(ctx context.Context, id int64) (*domain.Folder, error)
+	GetFoldersByParentID(ctx context.Context, parentID int64) ([]*domain.Folder, error)
+	UpdateFolder(ctx context.Context, folder *domain.Folder) error
+	DeleteFolder(ctx context.Context, id int64) error
+}
+
 type service struct {
 	repo dto.FolderRepository
 	log  log.Logger
@@ -73,7 +81,7 @@ func (s service) DeleteFolder(ctx context.Context, id int64) error {
 	return nil
 }
 
-func NewService(repo dto.FolderRepository, logger log.Logger) domain.FolderService {
+func NewService(repo dto.FolderRepository, logger log.Logger) FolderService {
 	return &service{
 		repo: repo,
 		log:  log.With(logger, "service", "folder"),

@@ -5,9 +5,10 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"remy_explorer/internal/explorer/domain"
 	fileSchemas "remy_explorer/internal/explorer/handler/http/schemas"
+	"remy_explorer/internal/explorer/service/file"
 )
 
-func makeCreateFileEndpoint(s domain.FileService) endpoint.Endpoint {
+func makeCreateFileEndpoint(s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(fileSchemas.CreateFileRequest)
 		f := domain.File{
@@ -23,7 +24,7 @@ func makeCreateFileEndpoint(s domain.FileService) endpoint.Endpoint {
 	}
 }
 
-func makeGetFileByIDEndpoint(s domain.FileService) endpoint.Endpoint {
+func makeGetFileByIDEndpoint(s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(fileSchemas.GetFileByIDRequest)
 		f, err := s.GetFileByID(ctx, req.ID)
@@ -41,7 +42,7 @@ func makeGetFileByIDEndpoint(s domain.FileService) endpoint.Endpoint {
 	}
 }
 
-func makeGetFilesByParentIDEndpoint(s domain.FileService) endpoint.Endpoint {
+func makeGetFilesByParentIDEndpoint(s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(fileSchemas.GetFilesByFolderIDRequest)
 		files, err := s.GetFilesByFolderID(ctx, req.FolderID)
@@ -61,7 +62,7 @@ func makeGetFilesByParentIDEndpoint(s domain.FileService) endpoint.Endpoint {
 	}
 }
 
-func makeUpdateFileEndpoint(s domain.FileService) endpoint.Endpoint {
+func makeUpdateFileEndpoint(s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(fileSchemas.UpdateFileRequest)
 		f := domain.File{
@@ -74,7 +75,7 @@ func makeUpdateFileEndpoint(s domain.FileService) endpoint.Endpoint {
 	}
 }
 
-func makeDeleteFileEndpoint(s domain.FileService) endpoint.Endpoint {
+func makeDeleteFileEndpoint(s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(fileSchemas.DeleteFileRequest)
 		ok, err := s.DeleteFile(ctx, req.ID)

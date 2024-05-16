@@ -17,7 +17,6 @@
 package domain
 
 import (
-	"context"
 	"time"
 )
 
@@ -32,13 +31,4 @@ type File struct {
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 	Tags       []string  `json:"tags"`
-}
-
-// FileService provides file operations
-type FileService interface {
-	CreateFile(ctx context.Context, f *File) (*int64, error)
-	GetFileByID(ctx context.Context, id int64) (*File, error)
-	GetFilesByFolderID(ctx context.Context, parentID int64) ([]*File, error)
-	UpdateFile(ctx context.Context, f *File) (bool, error)
-	DeleteFile(ctx context.Context, id int64) (bool, error)
 }
