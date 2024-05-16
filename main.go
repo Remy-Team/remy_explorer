@@ -1,4 +1,4 @@
-package api
+package remy_explorer
 
 import (
 	"context"
@@ -10,10 +10,9 @@ import (
 	"os"
 	"os/signal"
 	"remy_explorer/internal/config"
-	httpAPI "remy_explorer/internal/explorer/api/http"
-	filerep "remy_explorer/internal/explorer/repository/file"
-	folderrep "remy_explorer/internal/explorer/repository/folder"
-	"remy_explorer/internal/explorer/repository/postgresql"
+	"remy_explorer/internal/explorer/domain"
+	handler "remy_explorer/internal/explorer/handler/http"
+	repo "remy_explorer/internal/explorer/repository/postgresql"
 	"remy_explorer/internal/explorer/service/file"
 	"remy_explorer/internal/explorer/service/folder"
 	"syscall"
@@ -31,7 +30,7 @@ func main() {
 
 	cfg := config.GetConfig(logger)
 	//Init database client
-	pool, err := postgresql.New(context.TODO(), cfg.Storage, 5)
+	pool, err := repo.NewClient(context.TODO(), cfg.Storage, 5)
 	if err != nil {
 		level.Error(logger).Log("message", "Failed to connect to the database", "error", err)
 		return
@@ -40,14 +39,14 @@ func main() {
 	flag.Parse()
 
 	// Create file service
-	var fileSvc file.Service
+	var fileSvc domain.FileService
 	{
-		rep := filerep.New(pool, logger)
+		rep := repo.NewFileRepo(pool, logger)
 		fileSvc = file.NewService(rep, logger)
 	}
-	var folderSvc folder.Service
+	var folderSvc domain.FolderService
 	{
-		rep := folderrep.New(pool, logger)
+		rep := repo.NewFolderRepo(pool, logger)
 		folderSvc = folder.NewService(rep, logger)
 	}
 	errs := make(chan error)
@@ -58,11 +57,11 @@ func main() {
 	}()
 	level.Info(logger).Log("message", "Service is ready to listen and serve", "type", cfg.Listen.Type, "bind_ip", cfg.Listen.BindIP, "port", cfg.Listen.Port)
 
-	endpoints := httpAPI.MakeEndpoints(fileSvc, folderSvc)
+	endpoints := handler.MakeEndpoints(fileSvc, folderSvc)
 
 	go func() {
 		fmt.Println("Listening on", cfg.Listen)
-		handler := httpAPI.NewHTTPServer(endpoints)
+		handler := handler.NewHTTPServer(endpoints)
 		errs <- http.ListenAndServe(cfg.Listen.BindIP+":"+cfg.Listen.Port, handler)
 	}()
 	level.Error(logger).Log("exit", <-errs)

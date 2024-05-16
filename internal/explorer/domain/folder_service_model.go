@@ -10,9 +10,10 @@
 //	CONSTRAINT fk_folder_parent_id FOREIGN KEY (parent_id) REFERENCES public.folder (id)
 //
 // );
-package folder
+package domain
 
 import (
+	"context"
 	"time"
 )
 
@@ -23,4 +24,12 @@ type Folder struct {
 	ParentID  int64     `json:"parent"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type FolderService interface {
+	CreateFolder(ctx context.Context, folder *Folder) (*int64, error)
+	GetFolderByID(ctx context.Context, id int64) (*Folder, error)
+	GetFoldersByParentID(ctx context.Context, parentID int64) ([]*Folder, error)
+	UpdateFolder(ctx context.Context, folder *Folder) error
+	DeleteFolder(ctx context.Context, id int64) error
 }

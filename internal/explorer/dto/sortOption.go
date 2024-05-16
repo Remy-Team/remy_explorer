@@ -1,4 +1,4 @@
-package file
+package dto
 
 // this abstraction of the sort option is used to define the order in which the results should be sorted
 // it helps to avoid using string literals in the SQL query and to avoid SQL injection

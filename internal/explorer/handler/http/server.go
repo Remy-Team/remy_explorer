@@ -6,7 +6,7 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"net/http"
-	"remy_explorer/internal/explorer/api/http/schemas"
+	"remy_explorer/internal/explorer/handler/http/schemas"
 )
 
 // NewHTTPServer returns a new HTTP server

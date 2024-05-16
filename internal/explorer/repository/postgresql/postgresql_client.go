@@ -31,10 +31,10 @@ type Client interface {
 	Begin(ctx context.Context) (pgx.Tx, error)
 }
 
-// New creates a new Client from a pgx.Conn.
+// NewClient creates a new Client from a pgx.Conn.
 // It connects to the database using the provided connection details and returns a pool of connections.
 // The function will attempt to connect to the database maxAttempts times before failing.
-func New(ctx context.Context, conn config.StorageConfig, maxAttempts int) (pool *pgxpool.Pool, err error) {
+func NewClient(ctx context.Context, conn config.StorageConfig, maxAttempts int) (pool *pgxpool.Pool, err error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", conn.Host, conn.User, conn.Password, conn.Database)
 	err = utils.DoWithTries(func() error {
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)

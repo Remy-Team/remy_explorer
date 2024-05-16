@@ -1,14 +1,27 @@
-package file
+package dto
 
-// DTO for File entity in the database.
+// FileDTO for File entity in the database.
 import (
+	"context"
 	"database/sql"
-	"remy_explorer/internal/explorer/service/file"
+	"remy_explorer/internal/explorer/domain"
 	"time"
 )
 
-// DTO is the data transfer object for the File entity in the database.
-type DTO struct {
+// FileRepository is the interface that defines the methods that a file repository must implement.
+type FileRepository interface {
+	CreateFile(ctx context.Context, file *FileDTO) (*int64, error)
+	GetFileByID(ctx context.Context, id int64) (*FileDTO, error)
+	GetFilesByFolderID(ctx context.Context, folderID int64) ([]*FileDTO, error)
+	UpdateFile(ctx context.Context, file *FileDTO) error
+	DeleteFile(ctx context.Context, id int64) error
+	GetFilesByFolderIdSorted(ctx context.Context, folderID int64, sortOption *SortOption) ([]*FileDTO, error)
+}
+
+//TODO Можно добавить лимит и оффсет для пагинации файлов
+
+// FileDTO is the data transfer object for the File entity in the database.
+type FileDTO struct {
 	ID         int64            `json:"id"`
 	OwnerID    string           `json:"owner_id"`
 	Name       string           `json:"name"`
@@ -21,12 +34,12 @@ type DTO struct {
 	Tags       []sql.NullString `json:"tags"`
 }
 
-func (d DTO) ToDomain() *file.File {
+func (d FileDTO) ToDomain() *domain.File {
 	tags := make([]string, 0)
 	for _, tag := range d.Tags {
 		tags = append(tags, tag.String)
 	}
-	return &file.File{
+	return &domain.File{
 		ID:         d.ID,
 		OwnerID:    d.OwnerID,
 		Name:       d.Name,
@@ -40,13 +53,13 @@ func (d DTO) ToDomain() *file.File {
 	}
 }
 
-// ToDTO converts a File to a FileDTO.
-func ToDTO(f *file.File) DTO {
+// FileToDTO converts a File to a FileDTO.
+func FileToDTO(f *domain.File) FileDTO {
 	tags := make([]sql.NullString, 0)
 	for _, tag := range f.Tags {
 		tags = append(tags, sql.NullString{String: tag, Valid: true})
 	}
-	return DTO{
+	return FileDTO{
 		ID:         f.ID,
 		OwnerID:    f.OwnerID,
 		Name:       f.Name,

@@ -3,14 +3,14 @@ package http
 import (
 	"context"
 	"github.com/go-kit/kit/endpoint"
-	"remy_explorer/internal/explorer/api/http/schemas"
-	folder2 "remy_explorer/internal/explorer/service/folder"
+	"remy_explorer/internal/explorer/domain"
+	"remy_explorer/internal/explorer/handler/http/schemas"
 )
 
-func makeCreateFolderEndpoint(s folder2.Service) endpoint.Endpoint {
+func makeCreateFolderEndpoint(s domain.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(schemas.CreateFolderRequest)
-		f := folder2.Folder{
+		f := domain.Folder{
 			Name:     req.Name,
 			OwnerID:  req.OwnerID,
 			ParentID: req.ParentID,
@@ -20,7 +20,7 @@ func makeCreateFolderEndpoint(s folder2.Service) endpoint.Endpoint {
 	}
 }
 
-func makeGetFolderByIDEndpoint(s folder2.Service) endpoint.Endpoint {
+func makeGetFolderByIDEndpoint(s domain.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(schemas.GetFolderByIDRequest)
 		f, err := s.GetFolderByID(ctx, req.ID)
@@ -35,7 +35,7 @@ func makeGetFolderByIDEndpoint(s folder2.Service) endpoint.Endpoint {
 	}
 }
 
-func makeGetFoldersByParentIDEndpoint(s folder2.Service) endpoint.Endpoint {
+func makeGetFoldersByParentIDEndpoint(s domain.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(schemas.GetFoldersByParentIDRequest)
 		folders, err := s.GetFoldersByParentID(ctx, req.ParentID)
@@ -54,10 +54,10 @@ func makeGetFoldersByParentIDEndpoint(s folder2.Service) endpoint.Endpoint {
 	}
 }
 
-func makeUpdateFolderEndpoint(s folder2.Service) endpoint.Endpoint {
+func makeUpdateFolderEndpoint(s domain.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(schemas.UpdateFolderRequest)
-		f := folder2.Folder{
+		f := domain.Folder{
 			ID:       req.ID,
 			Name:     req.Name,
 			ParentID: req.ParentID,
@@ -68,7 +68,7 @@ func makeUpdateFolderEndpoint(s folder2.Service) endpoint.Endpoint {
 
 }
 
-func makeDeleteFolderEndpoint(s folder2.Service) endpoint.Endpoint {
+func makeDeleteFolderEndpoint(s domain.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(schemas.DeleteFolderRequest)
 		err := s.DeleteFolder(ctx, req.ID)
