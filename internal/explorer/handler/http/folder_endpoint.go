@@ -17,8 +17,8 @@ import (
 //	@Produce		json
 //	@Param			body	body		schemas.CreateFolderRequest	true	"Create Folder Request"
 //	@Success		200		{object}	schemas.CreateFolderResponse
-//	@Failure		400		{object} 	schemas.ErrorResponse
-//	@Failure		500		{object} 	schemas.ErrorResponse
+//	@Failure		400		{object}	schemas.ErrorResponse
+//	@Failure		500		{object}	schemas.ErrorResponse
 //	@Router			/folders [post]
 func makeCreateFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -42,8 +42,8 @@ func makeCreateFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
 //	@Produce		json
 //	@Param			id	path		string	true	"Folder ID"
 //	@Success		200	{object}	schemas.GetFolderByIDResponse
-//	@Failure		404	{object} 	schemas.ErrorResponse
-//	@Failure		500	{object} 	schemas.ErrorResponse
+//	@Failure		404	{object}	schemas.ErrorResponse
+//	@Failure		500	{object}	schemas.ErrorResponse
 //	@Router			/folders/{id} [get]
 func makeGetFolderByIDEndpoint(s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -69,8 +69,8 @@ func makeGetFolderByIDEndpoint(s folder.FolderService) endpoint.Endpoint {
 //	@Produce		json
 //	@Param			parentID	path		string	true	"Parent Folder ID"
 //	@Success		200			{array}		schemas.GetFoldersByParentIDResponse
-//	@Failure		404			{object} 	schemas.ErrorResponse
-//	@Failure		500			{object} 	schemas.ErrorResponse
+//	@Failure		404			{object}	schemas.ErrorResponse
+//	@Failure		500			{object}	schemas.ErrorResponse
 //	@Router			/folders/{parentID}/subfolders [get]
 func makeGetFoldersByParentIDEndpoint(s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
@@ -99,9 +99,9 @@ func makeGetFoldersByParentIDEndpoint(s folder.FolderService) endpoint.Endpoint 
 //	@Produce		json
 //	@Param			body	body		schemas.UpdateFolderRequest	true	"Update Folder Request"
 //	@Success		200		{object}	schemas.UpdateFolderResponse
-//	@Failure		400		{object} 	schemas.ErrorResponse
-//	@Failure		404		{object} 	schemas.ErrorResponse
-//	@Failure		500		{object} 	schemas.ErrorResponse
+//	@Failure		400		{object}	schemas.ErrorResponse
+//	@Failure		404		{object}	schemas.ErrorResponse
+//	@Failure		500		{object}	schemas.ErrorResponse
 //	@Router			/folders [put]
 func makeUpdateFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -125,8 +125,8 @@ func makeUpdateFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
 //	@Produce		json
 //	@Param			id	path		string	true	"Folder ID"
 //	@Success		200	{object}	schemas.DeleteFolderResponse
-//	@Failure		404	{object} 	schemas.ErrorResponse
-//	@Failure		500	{object} 	schemas.ErrorResponse
+//	@Failure		404	{object}	schemas.ErrorResponse
+//	@Failure		500	{object}	schemas.ErrorResponse
 //	@Router			/folders/{id} [delete]
 func makeDeleteFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {

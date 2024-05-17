@@ -770,7 +770,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:1234",
-	BasePath:         "/api/v1",
+	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Remy Explorer API",
 	Description:      "This is a file and folder explorer API",

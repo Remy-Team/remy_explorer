@@ -43,8 +43,8 @@ func NewHTTPServer(endpoints Endpoints) http.Handler {
 	//	@Produce		json
 	//	@Param			body	body		schemas.CreateFileRequest	true	"Create File Request"
 	//	@Success		200		{object}	schemas.CreateFileResponse
-	//	@Failure		400		{object} 	schemas.ErrorResponse
-	//	@Failure		500		{object} 	schemas.ErrorResponse
+	//	@Failure		400		{object}	schemas.ErrorResponse
+	//	@Failure		500		{object}	schemas.ErrorResponse
 	//	@Router			/files [post]
 	r.Methods("POST").Path("/files").Handler(httptransport.NewServer(
 		endpoints.CreateFile,
@@ -59,8 +59,8 @@ func NewHTTPServer(endpoints Endpoints) http.Handler {
 	//	@Produce		json
 	//	@Param			id	path		string	true	"File ID"
 	//	@Success		200	{object}	schemas.GetFileByIDResponse
-	//	@Failure		404	{object} 	schemas.ErrorResponse
-	//	@Failure		500	{object} 	schemas.ErrorResponse
+	//	@Failure		404	{object}	schemas.ErrorResponse
+	//	@Failure		500	{object}	schemas.ErrorResponse
 	//	@Router			/files/{id} [get]
 	r.Methods("GET").Path("/files/{id}").Handler(httptransport.NewServer(
 		endpoints.GetFileByID,
@@ -75,8 +75,8 @@ func NewHTTPServer(endpoints Endpoints) http.Handler {
 	//	@Produce		json
 	//	@Param			folderID	query		string	true	"Folder ID"
 	//	@Success		200			{array}		schemas.GetFilesByFolderIDResponse
-	//	@Failure		404			{object} 	schemas.ErrorResponse
-	//	@Failure		500			{object} 	schemas.ErrorResponse
+	//	@Failure		404			{object}	schemas.ErrorResponse
+	//	@Failure		500			{object}	schemas.ErrorResponse
 	//	@Router			/files [get]
 	r.Methods("GET").Path("/files").Handler(httptransport.NewServer(
 		endpoints.GetFilesByParentID,
@@ -91,9 +91,9 @@ func NewHTTPServer(endpoints Endpoints) http.Handler {
 	//	@Produce		json
 	//	@Param			body	body		schemas.UpdateFileRequest	true	"Update File Request"
 	//	@Success		200		{object}	schemas.UpdateFileResponse
-	//	@Failure		400		{object} 	schemas.ErrorResponse
-	//	@Failure		404		{object} 	schemas.ErrorResponse
-	//	@Failure		500		{object} 	schemas.ErrorResponse
+	//	@Failure		400		{object}	schemas.ErrorResponse
+	//	@Failure		404		{object}	schemas.ErrorResponse
+	//	@Failure		500		{object}	schemas.ErrorResponse
 	//	@Router			/files [put]
 	r.Methods("PUT").Path("/files").Handler(httptransport.NewServer(
 		endpoints.UpdateFile,
@@ -108,8 +108,8 @@ func NewHTTPServer(endpoints Endpoints) http.Handler {
 	//	@Produce		json
 	//	@Param			id	path		string	true	"File ID"
 	//	@Success		200	{object}	schemas.DeleteFileResponse
-	//	@Failure		404	{object} 	schemas.ErrorResponse
-	//	@Failure		500	{object} 	schemas.ErrorResponse
+	//	@Failure		404	{object}	schemas.ErrorResponse
+	//	@Failure		500	{object}	schemas.ErrorResponse
 	//	@Router			/files/{id} [delete]
 	r.Methods("DELETE").Path("/files/{id}").Handler(httptransport.NewServer(
 		endpoints.DeleteFile,

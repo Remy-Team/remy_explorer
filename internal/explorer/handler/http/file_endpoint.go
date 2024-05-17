@@ -17,8 +17,8 @@ import (
 //	@Produce		json
 //	@Param			body	body		schemas.CreateFileRequest	true	"Create File Request"
 //	@Success		200		{object}	schemas.CreateFileResponse
-//	@Failure		400		{object} 	schemas.ErrorResponse
-//	@Failure		500		{object} 	schemas.ErrorResponse
+//	@Failure		400		{object}	schemas.ErrorResponse
+//	@Failure		500		{object}	schemas.ErrorResponse
 //	@Router			/files [post]
 func makeCreateFileEndpoint(s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -45,8 +45,8 @@ func makeCreateFileEndpoint(s file.FileService) endpoint.Endpoint {
 //	@Produce		json
 //	@Param			id	path		string	true	"File ID"
 //	@Success		200	{object}	schemas.GetFileByIDResponse
-//	@Failure		404	{object} 	schemas.ErrorResponse
-//	@Failure		500	{object} 	schemas.ErrorResponse
+//	@Failure		404	{object}	schemas.ErrorResponse
+//	@Failure		500	{object}	schemas.ErrorResponse
 //	@Router			/files/{id} [get]
 func makeGetFileByIDEndpoint(s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -75,8 +75,8 @@ func makeGetFileByIDEndpoint(s file.FileService) endpoint.Endpoint {
 //	@Produce		json
 //	@Param			folderID	path		string	true	"Folder ID"
 //	@Success		200			{object}	schemas.GetFilesByFolderIDResponse
-//	@Failure		404			{object} 	schemas.ErrorResponse
-//	@Failure		500			{object} 	schemas.ErrorResponse
+//	@Failure		404			{object}	schemas.ErrorResponse
+//	@Failure		500			{object}	schemas.ErrorResponse
 //	@Router			/folders/{folderID}/files [get]
 func makeGetFilesByParentIDEndpoint(s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -107,9 +107,9 @@ func makeGetFilesByParentIDEndpoint(s file.FileService) endpoint.Endpoint {
 //	@Produce		json
 //	@Param			body	body		schemas.UpdateFileRequest	true	"Update File Request"
 //	@Success		200		{object}	schemas.UpdateFileResponse
-//	@Failure		400		{object} 	schemas.ErrorResponse
-//	@Failure		404		{object} 	schemas.ErrorResponse
-//	@Failure		500		{object} 	schemas.ErrorResponse
+//	@Failure		400		{object}	schemas.ErrorResponse
+//	@Failure		404		{object}	schemas.ErrorResponse
+//	@Failure		500		{object}	schemas.ErrorResponse
 //	@Router			/files [put]
 func makeUpdateFileEndpoint(s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -133,8 +133,8 @@ func makeUpdateFileEndpoint(s file.FileService) endpoint.Endpoint {
 //	@Produce		json
 //	@Param			id	path		string	true	"File ID"
 //	@Success		200	{object}	schemas.DeleteFileResponse
-//	@Failure		404	{object} 	schemas.ErrorResponse
-//	@Failure		500	{object} 	schemas.ErrorResponse
+//	@Failure		404	{object}	schemas.ErrorResponse
+//	@Failure		500	{object}	schemas.ErrorResponse
 //	@Router			/files/{id} [delete]
 func makeDeleteFileEndpoint(s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
