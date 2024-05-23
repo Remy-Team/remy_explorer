@@ -202,13 +202,13 @@ host: localhost:1234
 info:
   contact:
     email: remystorage@yandex.ru
-    name: Remy Explorer
+    name: Remy Team
   description: This is a file and folder explorer API
   license:
     name: MIT
     url: http://opensource.org/licenses/MIT
   title: Remy Explorer API
-  version: "1.0"
+  version: 0.0.1
 paths:
   /files:
     post:
@@ -510,8 +510,4 @@ paths:
       summary: Get folders by parent ID
       tags:
       - folders
-produces:
-- application/json
-schemes:
-- http
 swagger: "2.0"

@@ -18,7 +18,7 @@ import (
 )
 
 //	@title			Remy Explorer API
-//	@version		1.0
+//	@version		0.0.1
 //	@description	This is a file and folder explorer API
 //	@BasePath		/
 //	@host			localhost:1234
@@ -26,7 +26,7 @@ import (
 //	@produce		json
 //	@consumes		json
 
-//	@contact.name	Remy Explorer
+//	@contact.name	Remy Team
 //	@contact.email	remystorage@yandex.ru
 //	@license.name	MIT
 //	@license.url	http://opensource.org/licenses/MIT

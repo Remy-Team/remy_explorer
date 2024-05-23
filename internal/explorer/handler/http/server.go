@@ -7,110 +7,42 @@ import (
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
+	_ "remy_explorer/docs"
 	"remy_explorer/internal/explorer/handler/http/schemas"
 )
 
-//	@title			Remy Explorer API
-//	@version		1.0
-//	@description	This is the API documentation for Remy Explorer.
-//	@termsOfService	http://remy_explorer.com/terms/
-
-//	@contact.name	API Support
-//	@contact.url	http://www.remy_explorer.com/support
-//	@contact.email	support@remy_explorer.com
-
-//	@license.name	Apache 2.0
-//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
-
-// NewHTTPServer @host localhost:8080
-//
-//	@BasePath	/
-//
 // NewHTTPServer creates a new HTTP server and registers all endpoints
 func NewHTTPServer(endpoints Endpoints) http.Handler {
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 
 	// Swagger UI
-	r.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
-	// Redirect to Swagger UI
-	r.PathPrefix("/").Handler(http.RedirectHandler("/swagger/index.html", http.StatusFound))
+	r.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
 
-	//	@Summary		Create a new file
-	//	@Description	Create a new file in the system
-	//	@Tags			files
-	//	@Accept			json
-	//	@Produce		json
-	//	@Param			body	body		schemas.CreateFileRequest	true	"Create File Request"
-	//	@Success		200		{object}	schemas.CreateFileResponse
-	//	@Failure		400		{object}	schemas.ErrorResponse
-	//	@Failure		500		{object}	schemas.ErrorResponse
-	//	@Router			/files [post]
 	r.Methods("POST").Path("/files").Handler(httptransport.NewServer(
 		endpoints.CreateFile,
 		decodeCreateFileRequest,
 		encodeResponse,
 	))
 
-	//	@Summary		Get file by ID
-	//	@Description	Retrieve a file's details by its ID
-	//	@Tags			files
-	//	@Accept			json
-	//	@Produce		json
-	//	@Param			id	path		string	true	"File ID"
-	//	@Success		200	{object}	schemas.GetFileByIDResponse
-	//	@Failure		404	{object}	schemas.ErrorResponse
-	//	@Failure		500	{object}	schemas.ErrorResponse
-	//	@Router			/files/{id} [get]
 	r.Methods("GET").Path("/files/{id}").Handler(httptransport.NewServer(
 		endpoints.GetFileByID,
 		decodeGetFileByIDRequest,
 		encodeResponse,
 	))
 
-	//	@Summary		Get files by folder ID
-	//	@Description	Retrieve a list of files within a specific folder
-	//	@Tags			files
-	//	@Accept			json
-	//	@Produce		json
-	//	@Param			folderID	query		string	true	"Folder ID"
-	//	@Success		200			{array}		schemas.GetFilesByFolderIDResponse
-	//	@Failure		404			{object}	schemas.ErrorResponse
-	//	@Failure		500			{object}	schemas.ErrorResponse
-	//	@Router			/files [get]
 	r.Methods("GET").Path("/files").Handler(httptransport.NewServer(
 		endpoints.GetFilesByParentID,
 		decodeGetFilesByParentIDRequest,
 		encodeResponse,
 	))
 
-	//	@Summary		Update a file
-	//	@Description	Update the details of an existing file
-	//	@Tags			files
-	//	@Accept			json
-	//	@Produce		json
-	//	@Param			body	body		schemas.UpdateFileRequest	true	"Update File Request"
-	//	@Success		200		{object}	schemas.UpdateFileResponse
-	//	@Failure		400		{object}	schemas.ErrorResponse
-	//	@Failure		404		{object}	schemas.ErrorResponse
-	//	@Failure		500		{object}	schemas.ErrorResponse
-	//	@Router			/files [put]
 	r.Methods("PUT").Path("/files").Handler(httptransport.NewServer(
 		endpoints.UpdateFile,
 		decodeUpdateFileRequest,
 		encodeResponse,
 	))
 
-	//	@Summary		Delete a file
-	//	@Description	Delete a file by its ID
-	//	@Tags			files
-	//	@Accept			json
-	//	@Produce		json
-	//	@Param			id	path		string	true	"File ID"
-	//	@Success		200	{object}	schemas.DeleteFileResponse
-	//	@Failure		404	{object}	schemas.ErrorResponse
-	//	@Failure		500	{object}	schemas.ErrorResponse
-	//	@Router			/files/{id} [delete]
 	r.Methods("DELETE").Path("/files/{id}").Handler(httptransport.NewServer(
 		endpoints.DeleteFile,
 		decodeDeleteFileRequest,

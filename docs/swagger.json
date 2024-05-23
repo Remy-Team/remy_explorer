@@ -1,23 +1,17 @@
 {
-    "produces": [
-        "application/json"
-    ],
-    "schemes": [
-        "http"
-    ],
     "swagger": "2.0",
     "info": {
         "description": "This is a file and folder explorer API",
         "title": "Remy Explorer API",
         "contact": {
-            "name": "Remy Explorer",
+            "name": "Remy Team",
             "email": "remystorage@yandex.ru"
         },
         "license": {
             "name": "MIT",
             "url": "http://opensource.org/licenses/MIT"
         },
-        "version": "1.0"
+        "version": "0.0.1"
     },
     "host": "localhost:1234",
     "basePath": "/",
