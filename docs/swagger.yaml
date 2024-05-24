@@ -198,7 +198,7 @@ definitions:
         description: Indicates whether the update was successful
         type: boolean
     type: object
-host: localhost:1234
+host: 127.0.0.1:1234
 info:
   contact:
     email: remystorage@yandex.ru
@@ -510,4 +510,8 @@ paths:
       summary: Get folders by parent ID
       tags:
       - folders
+produces:
+- application/json
+schemes:
+- http
 swagger: "2.0"

@@ -21,7 +21,7 @@ import (
 //	@version		0.0.1
 //	@description	This is a file and folder explorer API
 //	@BasePath		/
-//	@host			localhost:1234
+//	@host			127.0.0.1:1234
 //	@schemes		http
 //	@produce		json
 //	@consumes		json
@@ -42,8 +42,12 @@ func main() {
 	defer level.Info(logger).Log("message", "Service ended")
 
 	cfg := config.GetConfig(logger)
+
+	// Корневой контекст
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	//Init database client
-	pool, err := repo.NewClient(context.TODO(), cfg.Storage, 5)
+	pool, err := repo.NewClient(ctx, cfg.Storage, 5)
 	if err != nil {
 		level.Error(logger).Log("message", "Failed to connect to the database", "error", err)
 		return
@@ -66,16 +70,20 @@ func main() {
 	go func() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-		errs <- fmt.Errorf("%s", <-c)
+		sig := <-c
+		level.Info(logger).Log("message", "Received signal", "signal", sig)
+		cancel() // Cancel context if needed
+		errs <- fmt.Errorf("received signal: %s", sig)
 	}()
 	level.Info(logger).Log("message", "Service is ready to listen and serve", "type", cfg.Listen.Type, "bind_ip", cfg.Listen.BindIP, "port", cfg.Listen.Port)
 
 	endpoints := handler.MakeEndpoints(fileSvc, folderSvc)
 
 	go func() {
-		fmt.Println("Listening on", cfg.Listen)
-		httpHandler := handler.NewHTTPServer(endpoints)
-		errs <- http.ListenAndServe(cfg.Listen.BindIP+":"+cfg.Listen.Port, httpHandler)
+		address := cfg.Listen.BindIP + ":" + cfg.Listen.Port
+		level.Info(logger).Log("message", "HTTP server is starting", "address", address)
+		httpHandler := handler.NewHTTPServer(logger, endpoints)
+		errs <- http.ListenAndServe(address, httpHandler)
 	}()
 	level.Error(logger).Log("exit", <-errs)
 }
