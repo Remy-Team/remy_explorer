@@ -30,7 +30,7 @@ go mod download
 Для запуска проекта используйте команду `go run`:
 
 ```bash
-go run .
+go run ./cmd
 ```
 
 ## Тестирование
