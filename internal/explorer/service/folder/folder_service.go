@@ -9,11 +9,11 @@ import (
 )
 
 type FolderService interface {
-	CreateFolder(ctx context.Context, folder *domain.Folder) (*int64, error)
-	GetFolderByID(ctx context.Context, id int64) (*domain.Folder, error)
-	GetFoldersByParentID(ctx context.Context, parentID int64) ([]*domain.Folder, error)
+	CreateFolder(ctx context.Context, folder *domain.Folder) (*string, error)
+	GetFolderByID(ctx context.Context, id string) (*domain.Folder, error)
+	GetFoldersByParentID(ctx context.Context, parentID string) ([]*domain.Folder, error)
 	UpdateFolder(ctx context.Context, folder *domain.Folder) error
-	DeleteFolder(ctx context.Context, id int64) error
+	DeleteFolder(ctx context.Context, id string) error
 }
 
 type service struct {
@@ -21,7 +21,7 @@ type service struct {
 	log  log.Logger
 }
 
-func (s service) CreateFolder(ctx context.Context, f *domain.Folder) (*int64, error) {
+func (s service) CreateFolder(ctx context.Context, f *domain.Folder) (*string, error) {
 	logger := log.With(s.log, "folder", "CreateFolder")
 	folderDTO := dto.FolderToDTO(f)
 	id, err := s.repo.CreateFolder(ctx, folderDTO)
@@ -33,7 +33,7 @@ func (s service) CreateFolder(ctx context.Context, f *domain.Folder) (*int64, er
 	return id, nil
 }
 
-func (s service) GetFolderByID(ctx context.Context, id int64) (*domain.Folder, error) {
+func (s service) GetFolderByID(ctx context.Context, id string) (*domain.Folder, error) {
 	logger := log.With(s.log, "folder", "GetFolderByID")
 	folderDTO, err := s.repo.GetFolderByID(ctx, id)
 	if err != nil {
@@ -45,7 +45,7 @@ func (s service) GetFolderByID(ctx context.Context, id int64) (*domain.Folder, e
 	return folderDTO.ToDomain(), nil
 }
 
-func (s service) GetFoldersByParentID(ctx context.Context, parentID int64) ([]*domain.Folder, error) {
+func (s service) GetFoldersByParentID(ctx context.Context, parentID string) ([]*domain.Folder, error) {
 	logger := log.With(s.log, "folder", "GetFoldersByParentID")
 	folderDTOs, err := s.repo.GetFoldersByParentID(ctx, parentID)
 	if err != nil {
@@ -71,7 +71,7 @@ func (s service) UpdateFolder(ctx context.Context, folder *domain.Folder) error 
 	return nil
 }
 
-func (s service) DeleteFolder(ctx context.Context, id int64) error {
+func (s service) DeleteFolder(ctx context.Context, id string) error {
 	logger := log.With(s.log, "folder", "DeleteFolder")
 	if err := s.repo.DeleteFolder(ctx, id); err != nil {
 		level.Error(logger).Log("err", err)

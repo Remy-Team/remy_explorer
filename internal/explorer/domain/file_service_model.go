@@ -21,10 +21,10 @@ import (
 )
 
 type File struct {
-	ID         int64     `json:"id"`
+	ID         string    `json:"id"`
 	OwnerID    string    `json:"owner"`
 	Name       string    `json:"name"`
-	FolderID   int64     `json:"folder"`
+	FolderID   string    `json:"folder"`
 	ObjectPath string    `json:"object_path"`
 	Size       int       `json:"size"`
 	Type       string    `json:"type"`

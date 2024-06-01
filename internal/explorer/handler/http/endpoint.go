@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/log"
 	"remy_explorer/internal/explorer/service/file"
 	"remy_explorer/internal/explorer/service/folder"
 )
@@ -23,18 +24,18 @@ type Endpoints struct {
 }
 
 // MakeEndpoints initializes all Go kit endpoints for file operations
-func MakeEndpoints(fileS file.FileService, folderS folder.FolderService) Endpoints {
+func MakeEndpoints(logger log.Logger, fileS file.FileService, folderS folder.FolderService) Endpoints {
 	return Endpoints{
-		CreateFile:         makeCreateFileEndpoint(fileS),
-		GetFileByID:        makeGetFileByIDEndpoint(fileS),
-		GetFilesByParentID: makeGetFilesByParentIDEndpoint(fileS),
-		UpdateFile:         makeUpdateFileEndpoint(fileS),
-		DeleteFile:         makeDeleteFileEndpoint(fileS),
+		CreateFile:         makeCreateFileEndpoint(logger, fileS),
+		GetFileByID:        makeGetFileByIDEndpoint(logger, fileS),
+		GetFilesByParentID: makeGetFilesByParentIDEndpoint(logger, fileS),
+		UpdateFile:         makeUpdateFileEndpoint(logger, fileS),
+		DeleteFile:         makeDeleteFileEndpoint(logger, fileS),
 		// Folder endpoints
-		CreateFolder:         makeCreateFolderEndpoint(folderS),
-		GetFolderByID:        makeGetFolderByIDEndpoint(folderS),
-		GetFoldersByParentID: makeGetFoldersByParentIDEndpoint(folderS),
-		UpdateFolder:         makeUpdateFolderEndpoint(folderS),
-		DeleteFolder:         makeDeleteFolderEndpoint(folderS),
+		CreateFolder:         makeCreateFolderEndpoint(logger, folderS),
+		GetFolderByID:        makeGetFolderByIDEndpoint(logger, folderS),
+		GetFoldersByParentID: makeGetFoldersByParentIDEndpoint(logger, folderS),
+		UpdateFolder:         makeUpdateFolderEndpoint(logger, folderS),
+		DeleteFolder:         makeDeleteFolderEndpoint(logger, folderS),
 	}
 }

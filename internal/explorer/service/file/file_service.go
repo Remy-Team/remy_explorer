@@ -10,11 +10,11 @@ import (
 
 // FileService provides file operations
 type FileService interface {
-	CreateFile(ctx context.Context, f *domain.File) (*int64, error)
-	GetFileByID(ctx context.Context, id int64) (*domain.File, error)
-	GetFilesByFolderID(ctx context.Context, parentID int64) ([]*domain.File, error)
+	CreateFile(ctx context.Context, f *domain.File) (*string, error)
+	GetFileByID(ctx context.Context, id string) (*domain.File, error)
+	GetFilesByFolderID(ctx context.Context, parentID string) ([]*domain.File, error)
 	UpdateFile(ctx context.Context, f *domain.File) (bool, error)
-	DeleteFile(ctx context.Context, id int64) (bool, error)
+	DeleteFile(ctx context.Context, id string) (bool, error)
 }
 
 type service struct {
@@ -22,7 +22,7 @@ type service struct {
 	log  log.Logger
 }
 
-func (s service) CreateFile(ctx context.Context, f *domain.File) (*int64, error) {
+func (s service) CreateFile(ctx context.Context, f *domain.File) (*string, error) {
 	logger := log.With(s.log, "folder", "UpdateFolder")
 	fileDTO := dto.FileToDTO(f)
 	id, err := s.repo.CreateFile(ctx, &fileDTO)
@@ -34,7 +34,7 @@ func (s service) CreateFile(ctx context.Context, f *domain.File) (*int64, error)
 	return id, nil
 }
 
-func (s service) GetFileByID(ctx context.Context, id int64) (*domain.File, error) {
+func (s service) GetFileByID(ctx context.Context, id string) (*domain.File, error) {
 	logger := log.With(s.log, "folder", "GetFolderByID")
 	fileDTO, err := s.repo.GetFileByID(ctx, id)
 	if err != nil {
@@ -46,7 +46,7 @@ func (s service) GetFileByID(ctx context.Context, id int64) (*domain.File, error
 	return file, nil
 }
 
-func (s service) GetFilesByFolderID(ctx context.Context, parentID int64) ([]*domain.File, error) {
+func (s service) GetFilesByFolderID(ctx context.Context, parentID string) ([]*domain.File, error) {
 	logger := log.With(s.log, "folder", "GetFoldersByParentID")
 	fileDTOs, err := s.repo.GetFilesByFolderID(ctx, parentID)
 	if err != nil {
@@ -72,7 +72,7 @@ func (s service) UpdateFile(ctx context.Context, f *domain.File) (bool, error) {
 	return true, nil
 }
 
-func (s service) DeleteFile(ctx context.Context, id int64) (bool, error) {
+func (s service) DeleteFile(ctx context.Context, id string) (bool, error) {
 	logger := log.With(s.log, "folder", "DeleteFolder")
 	if err := s.repo.DeleteFile(ctx, id); err != nil {
 		level.Error(logger).Log("err", err)

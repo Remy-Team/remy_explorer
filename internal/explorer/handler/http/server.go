@@ -20,7 +20,7 @@ import (
 // NewHTTPServer initializes and returns a new HTTP server with all routes defined.
 func NewHTTPServer(logger log.Logger, endpoints Endpoints) http.Handler {
 	r := mux.NewRouter()
-	r.Use(commonMiddleware)
+	r.Use(commonMiddleware(logger))
 
 	// Swagger UI
 	r.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
@@ -29,8 +29,8 @@ func NewHTTPServer(logger log.Logger, endpoints Endpoints) http.Handler {
 	wrapEndpointsWithLogging(logger, &endpoints)
 
 	// Register file and folder routes
-	registerFileRoutes(r, endpoints)
-	registerFolderRoutes(r, endpoints)
+	registerFileRoutes(logger, r, endpoints)
+	registerFolderRoutes(logger, r, endpoints)
 
 	return r
 }
@@ -65,96 +65,104 @@ func makeLoggingMiddleware(logger log.Logger) endpoint.Middleware {
 	}
 }
 
-func registerFileRoutes(r *mux.Router, endpoints Endpoints) {
+func registerFileRoutes(logger log.Logger, r *mux.Router, endpoints Endpoints) {
 	r.Methods("POST").Path("/files").Handler(httptransport.NewServer(
 		endpoints.CreateFile,
 		decodeCreateFileRequest,
-		encodeResponse,
+		encodeResponse(logger),
 	))
 
 	r.Methods("GET").Path("/files/{id}").Handler(httptransport.NewServer(
 		endpoints.GetFileByID,
 		decodeGetFileByIDRequest,
-		encodeResponse,
+		encodeResponse(logger),
 	))
 
 	r.Methods("GET").Path("/files").Handler(httptransport.NewServer(
 		endpoints.GetFilesByParentID,
 		decodeGetFilesByParentIDRequest,
-		encodeResponse,
+		encodeResponse(logger),
 	))
 
 	r.Methods("PUT").Path("/files").Handler(httptransport.NewServer(
 		endpoints.UpdateFile,
 		decodeUpdateFileRequest,
-		encodeResponse,
+		encodeResponse(logger),
 	))
 
 	r.Methods("DELETE").Path("/files/{id}").Handler(httptransport.NewServer(
 		endpoints.DeleteFile,
 		decodeDeleteFileRequest,
-		encodeResponse,
+		encodeResponse(logger),
 	))
 }
 
-func registerFolderRoutes(r *mux.Router, endpoints Endpoints) {
+func registerFolderRoutes(logger log.Logger, r *mux.Router, endpoints Endpoints) {
 	r.Methods("POST").Path("/folders").Handler(httptransport.NewServer(
 		endpoints.CreateFolder,
-		decodeRequest(new(schemas.CreateFolderRequest)),
-		encodeResponse,
+		decodeCreateFolderRequest,
+		encodeResponse(logger),
 	))
 
 	r.Methods("GET").Path("/folders/{id}").Handler(httptransport.NewServer(
 		endpoints.GetFolderByID,
-		decodeRequest(new(schemas.GetFolderByIDRequest)),
-		encodeResponse,
+		decodeGetFolderByIDRequest,
+		encodeResponse(logger),
 	))
 
 	r.Methods("GET").Path("/folders").Handler(httptransport.NewServer(
 		endpoints.GetFoldersByParentID,
-		decodeRequest(new(schemas.GetFoldersByParentIDRequest)),
-		encodeResponse,
+		decodeGetFoldersByParentIDRequest,
+		encodeResponse(logger),
 	))
 
 	r.Methods("PUT").Path("/folders").Handler(httptransport.NewServer(
 		endpoints.UpdateFolder,
-		decodeRequest(new(schemas.UpdateFolderRequest)),
-		encodeResponse,
+		decodeUpdateFolderRequest,
+		encodeResponse(logger),
 	))
 
 	r.Methods("DELETE").Path("/folders/{id}").Handler(httptransport.NewServer(
 		endpoints.DeleteFolder,
-		decodeRequest(new(schemas.DeleteFolderRequest)),
-		encodeResponse,
+		decodeDeleteFolderRequest,
+		encodeResponse(logger),
 	))
 }
 
 // commonMiddleware adds common HTTP headers to all responses.
-func commonMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
-	})
-}
-
-func loggingMiddleware(logger log.Logger) endpoint.Middleware {
-	return func(next endpoint.Endpoint) endpoint.Endpoint {
-		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			logger.Log("msg", "calling endpoint", "request", request)
-			response, err = next(ctx, request)
-			logger.Log("msg", "called endpoint", "response", response, "err", err)
-			return
-		}
+func commonMiddleware(logger log.Logger) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			level.Info(logger).Log(
+				"msg", "received request",
+				"method", r.Method,
+				"url", r.URL.String(),
+			)
+			w.Header().Set("Content-Type", "application/json")
+			next.ServeHTTP(w, r)
+			level.Info(logger).Log(
+				"msg", "handled request",
+				"method", r.Method,
+				"url", r.URL.String(),
+			)
+		})
 	}
 }
 
 // encodeResponse encodes the response into JSON format and handles errors.
-func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
-	if e, ok := response.(error); ok {
-		http.Error(w, e.Error(), http.StatusInternalServerError)
-		return nil
+func encodeResponse(logger log.Logger) httptransport.EncodeResponseFunc {
+	return func(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+		if err, ok := response.(error); ok && err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			level.Error(logger).Log("msg", "error encoding response", "error", err)
+			return nil
+		}
+		err := json.NewEncoder(w).Encode(response)
+		if err != nil {
+			level.Error(logger).Log("msg", "error encoding response", "error", err)
+		}
+		return err
 	}
-	return json.NewEncoder(w).Encode(response)
 }
 
 func decodeCreateFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -200,4 +208,47 @@ func decodeDeleteFileRequest(_ context.Context, r *http.Request) (interface{}, e
 		return nil, errors.New("id is missing in parameters")
 	}
 	return schemas.DeleteFileRequest{ID: id}, nil
+}
+
+func decodeCreateFolderRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req schemas.CreateFolderRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+func decodeGetFolderByIDRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return nil, errors.New("id is missing in parameters")
+	}
+	return schemas.GetFolderByIDRequest{ID: id}, nil
+}
+
+func decodeGetFoldersByParentIDRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	parentID, ok := vars["parentID"]
+	if !ok {
+		return nil, errors.New("parentID is missing in parameters")
+	}
+	return schemas.GetFoldersByParentIDRequest{ParentID: parentID}, nil
+}
+
+func decodeUpdateFolderRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req schemas.UpdateFolderRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+func decodeDeleteFolderRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return nil, errors.New("id is missing in parameters")
+	}
+	return schemas.DeleteFolderRequest{ID: id}, nil
 }

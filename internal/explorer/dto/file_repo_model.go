@@ -10,22 +10,22 @@ import (
 
 // FileRepository is the interface that defines the methods that a file repository must implement.
 type FileRepository interface {
-	CreateFile(ctx context.Context, file *FileDTO) (*int64, error)
-	GetFileByID(ctx context.Context, id int64) (*FileDTO, error)
-	GetFilesByFolderID(ctx context.Context, folderID int64) ([]*FileDTO, error)
+	CreateFile(ctx context.Context, file *FileDTO) (*string, error)
+	GetFileByID(ctx context.Context, id string) (*FileDTO, error)
+	GetFilesByFolderID(ctx context.Context, folderID string) ([]*FileDTO, error)
 	UpdateFile(ctx context.Context, file *FileDTO) error
-	DeleteFile(ctx context.Context, id int64) error
-	GetFilesByFolderIdSorted(ctx context.Context, folderID int64, sortOption *SortOption) ([]*FileDTO, error)
+	DeleteFile(ctx context.Context, id string) error
+	GetFilesByFolderIdSorted(ctx context.Context, folderID string, sortOption *SortOption) ([]*FileDTO, error)
 }
 
 //TODO Можно добавить лимит и оффсет для пагинации файлов
 
 // FileDTO is the data transfer object for the File entity in the database.
 type FileDTO struct {
-	ID         int64            `json:"id"`
+	ID         string           `json:"id"`
 	OwnerID    string           `json:"owner_id"`
 	Name       string           `json:"name"`
-	FolderID   int64            `json:"folder_id"`
+	FolderID   string           `json:"folder_id"`
 	ObjectPath sql.NullString   `json:"object_path"`
 	Size       int              `json:"size"`
 	Type       sql.NullString   `json:"type"`

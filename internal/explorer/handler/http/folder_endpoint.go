@@ -2,7 +2,10 @@ package http
 
 import (
 	"context"
+	"errors"
 	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"remy_explorer/internal/explorer/domain"
 	"remy_explorer/internal/explorer/handler/http/schemas"
 	"remy_explorer/internal/explorer/service/folder"
@@ -20,9 +23,13 @@ import (
 //	@Failure		400		{object}	schemas.ErrorResponse
 //	@Failure		500		{object}	schemas.ErrorResponse
 //	@Router			/folders [post]
-func makeCreateFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
+func makeCreateFolderEndpoint(logger log.Logger, s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(schemas.CreateFolderRequest)
+		level.Info(logger).Log("msg", "entering  makeCreateFolderEndpoint", "request", request)
+		req, ok := request.(schemas.CreateFolderRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
 		f := domain.Folder{
 			Name:     req.Name,
 			OwnerID:  req.OwnerID,
@@ -45,9 +52,13 @@ func makeCreateFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
 //	@Failure		404	{object}	schemas.ErrorResponse
 //	@Failure		500	{object}	schemas.ErrorResponse
 //	@Router			/folders/{id} [get]
-func makeGetFolderByIDEndpoint(s folder.FolderService) endpoint.Endpoint {
+func makeGetFolderByIDEndpoint(logger log.Logger, s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(schemas.GetFolderByIDRequest)
+		level.Info(logger).Log("msg", "entering  makeGetFolderByIDEndpoint", "request", request)
+		req, ok := request.(schemas.GetFolderByIDRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
 		f, err := s.GetFolderByID(ctx, req.ID)
 		return schemas.GetFolderByIDResponse{
 			ID:        f.ID,
@@ -72,9 +83,13 @@ func makeGetFolderByIDEndpoint(s folder.FolderService) endpoint.Endpoint {
 //	@Failure		404			{object}	schemas.ErrorResponse
 //	@Failure		500			{object}	schemas.ErrorResponse
 //	@Router			/folders/{parentID}/subfolders [get]
-func makeGetFoldersByParentIDEndpoint(s folder.FolderService) endpoint.Endpoint {
+func makeGetFoldersByParentIDEndpoint(logger log.Logger, s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(schemas.GetFoldersByParentIDRequest)
+		level.Info(logger).Log("msg", "entering  makeGetFoldersByParentIDEndpoint", "request", request)
+		req, ok := request.(schemas.GetFoldersByParentIDRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
 		folders, err := s.GetFoldersByParentID(ctx, req.ParentID)
 		if err != nil {
 			return nil, err
@@ -103,16 +118,20 @@ func makeGetFoldersByParentIDEndpoint(s folder.FolderService) endpoint.Endpoint 
 //	@Failure		404		{object}	schemas.ErrorResponse
 //	@Failure		500		{object}	schemas.ErrorResponse
 //	@Router			/folders [put]
-func makeUpdateFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
+func makeUpdateFolderEndpoint(logger log.Logger, s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(schemas.UpdateFolderRequest)
+		level.Info(logger).Log("msg", "entering  makeUpdateFolderEndpoint", "request", request)
+		req, ok := request.(schemas.UpdateFolderRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
 		f := domain.Folder{
 			ID:       req.ID,
 			Name:     req.Name,
 			ParentID: req.ParentID,
 		}
 		err := s.UpdateFolder(ctx, &f)
-		return schemas.UpdateFolderResponse{Ok: err == nil}, err // TODO: replace true with returned value
+		return schemas.UpdateFolderResponse{Ok: err == nil}, err
 	}
 }
 
@@ -128,10 +147,14 @@ func makeUpdateFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
 //	@Failure		404	{object}	schemas.ErrorResponse
 //	@Failure		500	{object}	schemas.ErrorResponse
 //	@Router			/folders/{id} [delete]
-func makeDeleteFolderEndpoint(s folder.FolderService) endpoint.Endpoint {
+func makeDeleteFolderEndpoint(logger log.Logger, s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(schemas.DeleteFolderRequest)
+		level.Info(logger).Log("msg", "entering  makeDeleteFolderEndpoint", "request", request)
+		req, ok := request.(schemas.DeleteFolderRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
 		err := s.DeleteFolder(ctx, req.ID)
-		return schemas.DeleteFolderResponse{Ok: err == nil}, err // TODO: replace true with returned value
+		return schemas.DeleteFolderResponse{Ok: err == nil}, err
 	}
 }

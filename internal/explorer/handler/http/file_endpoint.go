@@ -2,7 +2,10 @@ package http
 
 import (
 	"context"
+	"errors"
 	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"remy_explorer/internal/explorer/domain"
 	schemas "remy_explorer/internal/explorer/handler/http/schemas"
 	"remy_explorer/internal/explorer/service/file"
@@ -20,9 +23,13 @@ import (
 //	@Failure		400		{object}	schemas.ErrorResponse
 //	@Failure		500		{object}	schemas.ErrorResponse
 //	@Router			/files [post]
-func makeCreateFileEndpoint(s file.FileService) endpoint.Endpoint {
+func makeCreateFileEndpoint(logger log.Logger, s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(schemas.CreateFileRequest)
+		level.Info(logger).Log("msg", "entering  makeCreateFileEndpoint", "request", request)
+		req, ok := request.(schemas.CreateFileRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
 		f := domain.File{
 			Name:       req.Name,
 			FolderID:   req.FolderID,
@@ -48,9 +55,13 @@ func makeCreateFileEndpoint(s file.FileService) endpoint.Endpoint {
 //	@Failure		404	{object}	schemas.ErrorResponse
 //	@Failure		500	{object}	schemas.ErrorResponse
 //	@Router			/files/{id} [get]
-func makeGetFileByIDEndpoint(s file.FileService) endpoint.Endpoint {
+func makeGetFileByIDEndpoint(logger log.Logger, s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(schemas.GetFileByIDRequest)
+		level.Info(logger).Log("msg", "entering  makeGetFileByIDEndpoint", "request", request)
+		req, ok := request.(schemas.GetFileByIDRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
 		f, err := s.GetFileByID(ctx, req.ID)
 		return schemas.GetFileByIDResponse{
 			ID:        f.ID,
@@ -78,9 +89,13 @@ func makeGetFileByIDEndpoint(s file.FileService) endpoint.Endpoint {
 //	@Failure		404			{object}	schemas.ErrorResponse
 //	@Failure		500			{object}	schemas.ErrorResponse
 //	@Router			/folders/{folderID}/files [get]
-func makeGetFilesByParentIDEndpoint(s file.FileService) endpoint.Endpoint {
+func makeGetFilesByParentIDEndpoint(logger log.Logger, s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(schemas.GetFilesByFolderIDRequest)
+		level.Info(logger).Log("msg", "entering  makeGetFilesByParentIDEndpoint", "request", request)
+		req, ok := request.(schemas.GetFilesByFolderIDRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
 		files, err := s.GetFilesByFolderID(ctx, req.FolderID)
 		length := len(files) // Used two times
 		shortFiles := make([]schemas.ShortFileInfo, length)
@@ -111,9 +126,13 @@ func makeGetFilesByParentIDEndpoint(s file.FileService) endpoint.Endpoint {
 //	@Failure		404		{object}	schemas.ErrorResponse
 //	@Failure		500		{object}	schemas.ErrorResponse
 //	@Router			/files [put]
-func makeUpdateFileEndpoint(s file.FileService) endpoint.Endpoint {
+func makeUpdateFileEndpoint(logger log.Logger, s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(schemas.UpdateFileRequest)
+		level.Info(logger).Log("msg", "entering  makeUpdateFileEndpoint", "request", request)
+		req, ok := request.(schemas.UpdateFileRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
 		f := domain.File{
 			ID:       req.ID,
 			Name:     req.Name,
@@ -136,9 +155,13 @@ func makeUpdateFileEndpoint(s file.FileService) endpoint.Endpoint {
 //	@Failure		404	{object}	schemas.ErrorResponse
 //	@Failure		500	{object}	schemas.ErrorResponse
 //	@Router			/files/{id} [delete]
-func makeDeleteFileEndpoint(s file.FileService) endpoint.Endpoint {
+func makeDeleteFileEndpoint(logger log.Logger, s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(schemas.DeleteFileRequest)
+		level.Info(logger).Log("msg", "entering  makeDeleteFileEndpoint", "request", request)
+		req, ok := request.(schemas.DeleteFileRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
 		ok, err := s.DeleteFile(ctx, req.ID)
 		return schemas.DeleteFileResponse{Ok: ok}, err
 	}
