@@ -4,7 +4,7 @@ package schemas
 type CreateFileRequest struct {
 	Name     string `json:"name" validate:"required"` // Name of the file
 	Type     string `json:"type"`                     // Type of the file
-	FolderID int64  `json:"folder_id"`                // ID of the parent folder
+	FolderID string `json:"folder_id"`                // ID of the parent folder
 	OwnerID  string `json:"owner_id"`                 // ID of the owner
 	Path     string `json:"path"`                     // Path where the file is stored
 	Size     int    `json:"size"`                     // Size of the file
@@ -12,21 +12,21 @@ type CreateFileRequest struct {
 
 // CreateFileResponse represents the response after creating a new file
 type CreateFileResponse struct {
-	ID int64 `json:"id"` // ID of the created file
+	ID string `json:"id"` // ID of the created file
 }
 
 // GetFileByIDRequest represents the request to get a file by its ID
 type GetFileByIDRequest struct {
-	ID int64 `json:"id" validate:"required"` // ID of the file to retrieve
+	ID string `json:"id" validate:"required"` // ID of the file to retrieve
 }
 
 // GetFileByIDResponse represents the response with the details of a file
 type GetFileByIDResponse struct {
-	ID        int64    `json:"id"`         // ID of the file
+	ID        string   `json:"id"`         // ID of the file
 	Name      string   `json:"name"`       // Name of the file
 	Type      string   `json:"type"`       // Type of the file
 	Size      int      `json:"size"`       // Size of the file
-	FolderID  int64    `json:"folder_id"`  // ID of the parent folder
+	FolderID  string   `json:"folder_id"`  // ID of the parent folder
 	Path      string   `json:"path"`       // Path where the file is stored
 	CreatedAt string   `json:"created_at"` // Timestamp when the file was created
 	UpdatedAt string   `json:"updated_at"` // Timestamp when the file was last updated
@@ -35,12 +35,12 @@ type GetFileByIDResponse struct {
 
 // GetFilesByFolderIDRequest represents the request to get files by folder ID
 type GetFilesByFolderIDRequest struct {
-	FolderID int64 `json:"folder_id" validate:"required"` // ID of the parent folder
+	FolderID string `json:"folder_id" validate:"required"` // ID of the parent folder
 }
 
 // ShortFileInfo represents a short version of file information
 type ShortFileInfo struct {
-	ID   int64  `json:"id"`   // ID of the file
+	ID   string `json:"id"`   // ID of the file
 	Name string `json:"name"` // Name of the file
 	Type string `json:"type"` // Type of the file
 }
@@ -53,9 +53,9 @@ type GetFilesByFolderIDResponse struct {
 
 // UpdateFileRequest represents the request to update a file
 type UpdateFileRequest struct {
-	ID       int64  `json:"id" validate:"required"`   // ID of the file to update
+	ID       string `json:"id" validate:"required"`   // ID of the file to update
 	Name     string `json:"name" validate:"required"` // New name of the file
-	FolderID int64  `json:"folder_id"`                // New parent folder ID
+	FolderID string `json:"folder_id"`                // New parent folder ID
 }
 
 // UpdateFileResponse represents the response after updating a file
@@ -65,7 +65,7 @@ type UpdateFileResponse struct {
 
 // DeleteFileRequest represents the request to delete a file
 type DeleteFileRequest struct {
-	ID int64 `json:"id" validate:"required"` // ID of the file to delete
+	ID string `json:"id" validate:"required"` // ID of the file to delete
 }
 
 // DeleteFileResponse represents the response after deleting a file

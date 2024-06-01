@@ -21,7 +21,6 @@ import (
 //	@version		0.0.1
 //	@description	This is a file and folder explorer API
 //	@BasePath		/
-//	@host			127.0.0.1:1234
 //	@schemes		http
 //	@produce		json
 //	@consumes		json

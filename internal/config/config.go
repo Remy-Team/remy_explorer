@@ -19,10 +19,10 @@ type Config struct {
 
 // StorageConfig is the database configuration structure that is read from the config file.
 type StorageConfig struct {
-	Host     string `json:"host"`
-	Port     string `json:"port"`
-	Database string `json:"database"`
-	User     string `json:"user"`
+	Host     string `json:"host" env-default:""`
+	Port     string `json:"port" env-default:""`
+	Database string `json:"database" env-default:""`
+	User     string `json:"user" env-default:""`
 	Password string `json:"password"`
 }
 

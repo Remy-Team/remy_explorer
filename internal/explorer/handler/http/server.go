@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
@@ -67,31 +68,31 @@ func makeLoggingMiddleware(logger log.Logger) endpoint.Middleware {
 func registerFileRoutes(r *mux.Router, endpoints Endpoints) {
 	r.Methods("POST").Path("/files").Handler(httptransport.NewServer(
 		endpoints.CreateFile,
-		decodeRequest(new(schemas.CreateFileRequest)),
+		decodeCreateFileRequest,
 		encodeResponse,
 	))
 
 	r.Methods("GET").Path("/files/{id}").Handler(httptransport.NewServer(
 		endpoints.GetFileByID,
-		decodeRequest(new(schemas.GetFileByIDRequest)),
+		decodeGetFileByIDRequest,
 		encodeResponse,
 	))
 
 	r.Methods("GET").Path("/files").Handler(httptransport.NewServer(
 		endpoints.GetFilesByParentID,
-		decodeRequest(new(schemas.GetFilesByFolderIDRequest)),
+		decodeGetFilesByParentIDRequest,
 		encodeResponse,
 	))
 
 	r.Methods("PUT").Path("/files").Handler(httptransport.NewServer(
 		endpoints.UpdateFile,
-		decodeRequest(new(schemas.UpdateFileRequest)),
+		decodeUpdateFileRequest,
 		encodeResponse,
 	))
 
 	r.Methods("DELETE").Path("/files/{id}").Handler(httptransport.NewServer(
 		endpoints.DeleteFile,
-		decodeRequest(new(schemas.DeleteFileRequest)),
+		decodeDeleteFileRequest,
 		encodeResponse,
 	))
 }
@@ -149,15 +150,54 @@ func loggingMiddleware(logger log.Logger) endpoint.Middleware {
 
 // encodeResponse encodes the response into JSON format and handles errors.
 func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	if e, ok := response.(error); ok {
+		http.Error(w, e.Error(), http.StatusInternalServerError)
+		return nil
+	}
 	return json.NewEncoder(w).Encode(response)
 }
 
-// decodeRequest creates a generic request decoder for a given type.
-func decodeRequest(target interface{}) httptransport.DecodeRequestFunc {
-	return func(_ context.Context, r *http.Request) (interface{}, error) {
-		if err := json.NewDecoder(r.Body).Decode(target); err != nil {
-			return nil, err
-		}
-		return target, nil
+func decodeCreateFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req schemas.CreateFileRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
 	}
+	return req, nil
+}
+
+func decodeUpdateFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req schemas.UpdateFileRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+func decodeGetFileByIDRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req schemas.GetFileByIDRequest
+	vars := mux.Vars(r)
+	if id, ok := vars["id"]; ok {
+		req.ID = id
+	} else {
+		return nil, errors.New("id is missing in parameters")
+	}
+	return req, nil
+}
+
+func decodeGetFilesByParentIDRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	parentID, ok := vars["parentID"]
+	if !ok {
+		return nil, errors.New("parentID is missing in parameters")
+	}
+	return schemas.GetFilesByFolderIDRequest{FolderID: parentID}, nil
+}
+
+func decodeDeleteFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return nil, errors.New("id is missing in parameters")
+	}
+	return schemas.DeleteFileRequest{ID: id}, nil
 }
