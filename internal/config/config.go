@@ -42,8 +42,8 @@ func GetConfigWithPath(logger log.Logger, path string) *Config {
 		instance = &Config{}
 		if err := cleanenv.ReadConfig(path, instance); err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
-			logger.Log("message", "Failed to read configuration", "error", err, "help", help)
-			//Fatal error, as the application cannot start without a valid configuration
+			logger.Log("message", "Failed to read configuration", "err", err, "help", help)
+			//Fatal err, as the application cannot start without a valid configuration
 			panic(err)
 		} else {
 			logger.Log("message", "Configuration read successfully")
