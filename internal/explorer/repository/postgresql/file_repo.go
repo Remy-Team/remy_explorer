@@ -104,8 +104,8 @@ func (r fileRepository) GetFilesByFolderID(ctx context.Context, folderID string)
 
 // UpdateFile updates a file in the database.
 func (r fileRepository) UpdateFile(ctx context.Context, file *dto.FileDTO) error {
-	q := `UPDATE public.file SET name = $1, folder_id = $2, object_path = $3, size = $4, type = $5, updated_at = $6, tags = $7 WHERE id = $8`
-	if _, err := r.client.Exec(ctx, q, file.Name, file.FolderID, file.ObjectPath, file.Size, file.Type, file.UpdatedAt, file.Tags, file.ID); err != nil {
+	q := `UPDATE public.file SET name = $1, folder_id = $2, object_path = $3, size = $4, type = $5, updated_at = CURRENT_TIMESTAMP, tags = $7 WHERE id = $8`
+	if _, err := r.client.Exec(ctx, q, file.Name, file.FolderID, file.ObjectPath, file.Size, file.Type, file.Tags, file.ID); err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)

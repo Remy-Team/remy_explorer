@@ -87,7 +87,7 @@ func (r folderRepository) GetFoldersByParentID(ctx context.Context, FolderID str
 
 // UpdateFolder updates a folder in the database.
 func (r folderRepository) UpdateFolder(ctx context.Context, folder *model.FolderDTO) error {
-	q := `UPDATE public.folder SET name = $1, parent_id = $2 WHERE id = $3`
+	q := `UPDATE public.folder SET name = $1, parent_id = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3`
 	if _, err := r.client.Exec(ctx, q, folder.Name, folder.ParentID, folder.ID); err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
