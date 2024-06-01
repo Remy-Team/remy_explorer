@@ -3,9 +3,9 @@ package postgresql
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"remy_explorer/internal/config"
 	"remy_explorer/internal/utils"
@@ -17,7 +17,7 @@ import (
 type Client interface {
 	// Exec executes a query without returning any rows.
 	// The args are for any placeholder parameters in the query.
-	Exec(ctx context.Context, sql string, arguments ...interface{}) (pgconn.CommandTag, error)
+	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
 
 	// Query sends a query to the database and returns the rows.
 	// The args are for any placeholder parameters in the query.
@@ -26,9 +26,6 @@ type Client interface {
 	// QueryRow sends a query to the database and returns a single row.
 	// The args are for any placeholder parameters in the query.
 	QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row
-
-	// Begin starts a new transaction.
-	Begin(ctx context.Context) (pgx.Tx, error)
 }
 
 // NewClient creates a new Client from a pgx.Conn.
@@ -36,20 +33,25 @@ type Client interface {
 // The function will attempt to connect to the database maxAttempts times before failing.
 func NewClient(ctx context.Context, conn config.StorageConfig, maxAttempts int) (pool *pgxpool.Pool, err error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", conn.Host, conn.User, conn.Password, conn.Database)
+	connConfig, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		log.Fatalf("Unable to parse DSN: %v", err)
+	}
+
+	// Пытаемся подключиться к базе данных с заданным количеством попыток
 	err = utils.DoWithTries(func() error {
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
 
-		pool, err = pgxpool.Connect(ctx, dsn)
+		pool, err = pgxpool.NewWithConfig(ctx, connConfig)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to connect to database: %v", err)
 		}
-
 		return nil
 	}, maxAttempts, 5*time.Second)
 
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Fatalf("Failed to connect to the database after %d attempts: %v", maxAttempts, err)
 	}
 	return pool, nil
 }
