@@ -6,8 +6,9 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	"remy_explorer/internal/explorer/domain"
+	model_err "remy_explorer/internal/explorer/err"
 	schemas "remy_explorer/internal/explorer/handler/http/schemas"
+	"remy_explorer/internal/explorer/model"
 	"remy_explorer/internal/explorer/service/file"
 )
 
@@ -30,7 +31,7 @@ func makeCreateFileEndpoint(logger log.Logger, s file.FileService) endpoint.Endp
 		if !ok {
 			return nil, errors.New("invalid request type")
 		}
-		f := domain.File{
+		f := model.File{
 			Name:       req.Name,
 			FolderID:   req.FolderID,
 			OwnerID:    req.OwnerID,
@@ -57,13 +58,22 @@ func makeCreateFileEndpoint(logger log.Logger, s file.FileService) endpoint.Endp
 //	@Router			/files/{id} [get]
 func makeGetFileByIDEndpoint(logger log.Logger, s file.FileService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		level.Info(logger).Log("msg", "entering  makeGetFileByIDEndpoint", "request", request)
 		req, ok := request.(schemas.GetFileByIDRequest)
 		if !ok {
+			level.Error(logger).Log("msg", "invalid request type")
 			return nil, errors.New("invalid request type")
 		}
 		f, err := s.GetFileByID(ctx, req.ID)
-		return schemas.GetFileByIDResponse{
+		if err != nil {
+			var errNotFound *model_err.NotFound
+			if errors.As(err, &errNotFound) {
+				return nil, err
+			}
+			level.Error(logger).Log("err", err, "msg", "failed to retrieve file")
+			return nil, err
+		}
+
+		response := schemas.GetFileByIDResponse{
 			ID:        f.ID,
 			Name:      f.Name,
 			FolderID:  f.FolderID,
@@ -73,7 +83,8 @@ func makeGetFileByIDEndpoint(logger log.Logger, s file.FileService) endpoint.End
 			CreatedAt: f.CreatedAt.String(),
 			UpdatedAt: f.UpdatedAt.String(),
 			Tags:      f.Tags,
-		}, err
+		}
+		return response, nil
 	}
 }
 
@@ -133,7 +144,7 @@ func makeUpdateFileEndpoint(logger log.Logger, s file.FileService) endpoint.Endp
 		if !ok {
 			return nil, errors.New("invalid request type")
 		}
-		f := domain.File{
+		f := model.File{
 			ID:       req.ID,
 			Name:     req.Name,
 			FolderID: req.FolderID,

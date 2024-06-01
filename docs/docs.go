@@ -490,7 +490,7 @@ const docTemplate = `{
             "properties": {
                 "folder_id": {
                     "description": "ID of the parent folder",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "Name of the file",
@@ -519,7 +519,7 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "description": "ID of the created file",
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -539,7 +539,7 @@ const docTemplate = `{
                 },
                 "parent_id": {
                     "description": "ID of the parent folder",
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -548,7 +548,7 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "description": "ID of the created folder",
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -593,11 +593,11 @@ const docTemplate = `{
                 },
                 "folder_id": {
                     "description": "ID of the parent folder",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "id": {
                     "description": "ID of the file",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "Name of the file",
@@ -653,7 +653,7 @@ const docTemplate = `{
                 },
                 "id": {
                     "description": "ID of the folder",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "Name of the folder",
@@ -665,7 +665,7 @@ const docTemplate = `{
                 },
                 "parent_id": {
                     "description": "ID of the parent folder",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "updated_at": {
                     "description": "Timestamp when the folder was last updated",
@@ -678,7 +678,7 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "description": "ID of the folder",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "Name of the folder",
@@ -691,7 +691,7 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "description": "ID of the file",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "Name of the file",
@@ -712,11 +712,11 @@ const docTemplate = `{
             "properties": {
                 "folder_id": {
                     "description": "New parent folder ID",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "id": {
                     "description": "ID of the file to update",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "New name of the file",
@@ -742,7 +742,7 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "description": "ID of the folder to update",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "New name of the folder",
@@ -750,7 +750,7 @@ const docTemplate = `{
                 },
                 "parent_id": {
                     "description": "New parent folder ID",
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -768,8 +768,8 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.0.1",
-	Host:             "127.0.0.1:1234",
+	Version:          "0.0.2",
+	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Remy Explorer API",

@@ -4,7 +4,7 @@ definitions:
     properties:
       folder_id:
         description: ID of the parent folder
-        type: integer
+        type: string
       name:
         description: Name of the file
         type: string
@@ -27,7 +27,7 @@ definitions:
     properties:
       id:
         description: ID of the created file
-        type: integer
+        type: string
     type: object
   schemas.CreateFolderRequest:
     properties:
@@ -39,7 +39,7 @@ definitions:
         type: string
       parent_id:
         description: ID of the parent folder
-        type: integer
+        type: string
     required:
     - name
     type: object
@@ -47,7 +47,7 @@ definitions:
     properties:
       id:
         description: ID of the created folder
-        type: integer
+        type: string
     type: object
   schemas.DeleteFileResponse:
     properties:
@@ -78,10 +78,10 @@ definitions:
         type: string
       folder_id:
         description: ID of the parent folder
-        type: integer
+        type: string
       id:
         description: ID of the file
-        type: integer
+        type: string
       name:
         description: Name of the file
         type: string
@@ -121,7 +121,7 @@ definitions:
         type: string
       id:
         description: ID of the folder
-        type: integer
+        type: string
       name:
         description: Name of the folder
         type: string
@@ -130,7 +130,7 @@ definitions:
         type: string
       parent_id:
         description: ID of the parent folder
-        type: integer
+        type: string
       updated_at:
         description: Timestamp when the folder was last updated
         type: string
@@ -139,7 +139,7 @@ definitions:
     properties:
       id:
         description: ID of the folder
-        type: integer
+        type: string
       name:
         description: Name of the folder
         type: string
@@ -148,7 +148,7 @@ definitions:
     properties:
       id:
         description: ID of the file
-        type: integer
+        type: string
       name:
         description: Name of the file
         type: string
@@ -160,10 +160,10 @@ definitions:
     properties:
       folder_id:
         description: New parent folder ID
-        type: integer
+        type: string
       id:
         description: ID of the file to update
-        type: integer
+        type: string
       name:
         description: New name of the file
         type: string
@@ -181,13 +181,13 @@ definitions:
     properties:
       id:
         description: ID of the folder to update
-        type: integer
+        type: string
       name:
         description: New name of the folder
         type: string
       parent_id:
         description: New parent folder ID
-        type: integer
+        type: string
     required:
     - id
     - name
@@ -198,7 +198,6 @@ definitions:
         description: Indicates whether the update was successful
         type: boolean
     type: object
-host: 127.0.0.1:1234
 info:
   contact:
     email: remystorage@yandex.ru
@@ -208,7 +207,7 @@ info:
     name: MIT
     url: http://opensource.org/licenses/MIT
   title: Remy Explorer API
-  version: 0.0.1
+  version: 0.0.2
 paths:
   /files:
     post:

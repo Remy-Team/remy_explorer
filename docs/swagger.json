@@ -17,9 +17,8 @@
             "name": "MIT",
             "url": "http://opensource.org/licenses/MIT"
         },
-        "version": "0.0.1"
+        "version": "0.0.2"
     },
-    "host": "127.0.0.1:1234",
     "basePath": "/",
     "paths": {
         "/files": {
@@ -487,7 +486,7 @@
             "properties": {
                 "folder_id": {
                     "description": "ID of the parent folder",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "Name of the file",
@@ -516,7 +515,7 @@
             "properties": {
                 "id": {
                     "description": "ID of the created file",
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -536,7 +535,7 @@
                 },
                 "parent_id": {
                     "description": "ID of the parent folder",
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -545,7 +544,7 @@
             "properties": {
                 "id": {
                     "description": "ID of the created folder",
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -590,11 +589,11 @@
                 },
                 "folder_id": {
                     "description": "ID of the parent folder",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "id": {
                     "description": "ID of the file",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "Name of the file",
@@ -650,7 +649,7 @@
                 },
                 "id": {
                     "description": "ID of the folder",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "Name of the folder",
@@ -662,7 +661,7 @@
                 },
                 "parent_id": {
                     "description": "ID of the parent folder",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "updated_at": {
                     "description": "Timestamp when the folder was last updated",
@@ -675,7 +674,7 @@
             "properties": {
                 "id": {
                     "description": "ID of the folder",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "Name of the folder",
@@ -688,7 +687,7 @@
             "properties": {
                 "id": {
                     "description": "ID of the file",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "Name of the file",
@@ -709,11 +708,11 @@
             "properties": {
                 "folder_id": {
                     "description": "New parent folder ID",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "id": {
                     "description": "ID of the file to update",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "New name of the file",
@@ -739,7 +738,7 @@
             "properties": {
                 "id": {
                     "description": "ID of the folder to update",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "New name of the folder",
@@ -747,7 +746,7 @@
                 },
                 "parent_id": {
                     "description": "New parent folder ID",
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },

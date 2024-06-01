@@ -6,8 +6,9 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	"remy_explorer/internal/explorer/domain"
+	model_err "remy_explorer/internal/explorer/err"
 	"remy_explorer/internal/explorer/handler/http/schemas"
+	"remy_explorer/internal/explorer/model"
 	"remy_explorer/internal/explorer/service/folder"
 )
 
@@ -30,7 +31,7 @@ func makeCreateFolderEndpoint(logger log.Logger, s folder.FolderService) endpoin
 		if !ok {
 			return nil, errors.New("invalid request type")
 		}
-		f := domain.Folder{
+		f := model.Folder{
 			Name:     req.Name,
 			OwnerID:  req.OwnerID,
 			ParentID: req.ParentID,
@@ -60,9 +61,17 @@ func makeGetFolderByIDEndpoint(logger log.Logger, s folder.FolderService) endpoi
 			return nil, errors.New("invalid request type")
 		}
 		f, err := s.GetFolderByID(ctx, req.ID)
+		if err != nil {
+			var errNotFound *model_err.NotFound
+			if errors.As(err, &errNotFound) {
+				return nil, err
+			}
+			level.Error(logger).Log("err", err, "msg", "failed to retrieve file")
+			return nil, err
+		}
 		return schemas.GetFolderByIDResponse{
 			ID:        f.ID,
-			OwnerID:   string(f.OwnerID),
+			OwnerID:   f.OwnerID,
 			Name:      f.Name,
 			ParentID:  f.ParentID,
 			CreatedAt: f.CreatedAt.String(),
@@ -125,7 +134,7 @@ func makeUpdateFolderEndpoint(logger log.Logger, s folder.FolderService) endpoin
 		if !ok {
 			return nil, errors.New("invalid request type")
 		}
-		f := domain.Folder{
+		f := model.Folder{
 			ID:       req.ID,
 			Name:     req.Name,
 			ParentID: req.ParentID,

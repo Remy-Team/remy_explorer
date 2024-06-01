@@ -18,7 +18,7 @@ import (
 )
 
 //	@title			Remy Explorer API
-//	@version		0.0.1
+//	@version		0.0.2
 //	@description	This is a file and folder explorer API
 //	@BasePath		/
 //	@schemes		http
@@ -49,7 +49,7 @@ func main() {
 	//Init database client
 	pool, err := repo.NewClient(ctx, cfg.Storage, 5)
 	if err != nil {
-		level.Error(logger).Log("message", "Failed to connect to the database", "error", err)
+		level.Error(logger).Log("message", "Failed to connect to the database", "err", err)
 		return
 	}
 	defer pool.Close()

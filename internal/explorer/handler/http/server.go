@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/go-kit/kit/endpoint"
+	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	"net/http"
-	"reflect"
-
-	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"net/http"
+	"reflect"
 	_ "remy_explorer/docs"
+	modelerr "remy_explorer/internal/explorer/err"
 	"remy_explorer/internal/explorer/handler/http/schemas"
 )
 
@@ -70,30 +70,35 @@ func registerFileRoutes(logger log.Logger, r *mux.Router, endpoints Endpoints) {
 		endpoints.CreateFile,
 		decodeCreateFileRequest,
 		encodeResponse(logger),
+		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 
 	r.Methods("GET").Path("/files/{id}").Handler(httptransport.NewServer(
 		endpoints.GetFileByID,
 		decodeGetFileByIDRequest,
 		encodeResponse(logger),
+		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 
 	r.Methods("GET").Path("/files").Handler(httptransport.NewServer(
 		endpoints.GetFilesByParentID,
 		decodeGetFilesByParentIDRequest,
 		encodeResponse(logger),
+		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 
 	r.Methods("PUT").Path("/files").Handler(httptransport.NewServer(
 		endpoints.UpdateFile,
 		decodeUpdateFileRequest,
 		encodeResponse(logger),
+		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 
 	r.Methods("DELETE").Path("/files/{id}").Handler(httptransport.NewServer(
 		endpoints.DeleteFile,
 		decodeDeleteFileRequest,
 		encodeResponse(logger),
+		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 }
 
@@ -102,24 +107,28 @@ func registerFolderRoutes(logger log.Logger, r *mux.Router, endpoints Endpoints)
 		endpoints.CreateFolder,
 		decodeCreateFolderRequest,
 		encodeResponse(logger),
+		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 
 	r.Methods("GET").Path("/folders/{id}").Handler(httptransport.NewServer(
 		endpoints.GetFolderByID,
 		decodeGetFolderByIDRequest,
 		encodeResponse(logger),
+		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 
-	r.Methods("GET").Path("/folders").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/folders/{parent_id}/subfolders").Handler(httptransport.NewServer(
 		endpoints.GetFoldersByParentID,
 		decodeGetFoldersByParentIDRequest,
 		encodeResponse(logger),
+		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 
 	r.Methods("PUT").Path("/folders").Handler(httptransport.NewServer(
 		endpoints.UpdateFolder,
 		decodeUpdateFolderRequest,
 		encodeResponse(logger),
+		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 
 	r.Methods("DELETE").Path("/folders/{id}").Handler(httptransport.NewServer(
@@ -152,31 +161,54 @@ func commonMiddleware(logger log.Logger) func(http.Handler) http.Handler {
 // encodeResponse encodes the response into JSON format and handles errors.
 func encodeResponse(logger log.Logger) httptransport.EncodeResponseFunc {
 	return func(ctx context.Context, w http.ResponseWriter, response interface{}) error {
-		if err, ok := response.(error); ok && err != nil {
+		level.Info(logger).Log("msg", "Encode", "response", response)
+		if err, ok := response.(error); ok {
+			level.Error(logger).Log("msg", "Error received in encoder", "error", err.Error())
+
+			var notFoundErr *modelerr.NotFound
+			if errors.As(err, &notFoundErr) {
+				http.Error(w, err.Error(), http.StatusNotFound)
+				level.Info(logger).Log("msg", "resource not found", "err", err)
+				return nil
+			}
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			level.Error(logger).Log("msg", "error encoding response", "error", err)
+			level.Error(logger).Log("msg", "error processing request", "err", err)
 			return nil
 		}
-		err := json.NewEncoder(w).Encode(response)
-		if err != nil {
-			level.Error(logger).Log("msg", "error encoding response", "error", err)
+		w.WriteHeader(http.StatusOK)
+		return json.NewEncoder(w).Encode(response)
+	}
+}
+
+func encodeErrorResponse(logger log.Logger) httptransport.ErrorEncoder {
+	return func(ctx context.Context, err error, w http.ResponseWriter) {
+		level.Error(logger).Log("err", err, "msg", "handling error")
+
+		var notFoundErr *modelerr.NotFound
+		if errors.As(err, &notFoundErr) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			level.Info(logger).Log("msg", "resource not found", "err", err)
+			return
 		}
-		return err
+
+		// Обработка других ошибок
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		level.Error(logger).Log("msg", "internal server error", "err", err)
 	}
 }
 
 func decodeCreateFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req schemas.CreateFileRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
+	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
+		return nil, e
 	}
 	return req, nil
 }
 
 func decodeUpdateFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req schemas.UpdateFileRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
+	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
+		return nil, e
 	}
 	return req, nil
 }
@@ -212,8 +244,8 @@ func decodeDeleteFileRequest(_ context.Context, r *http.Request) (interface{}, e
 
 func decodeCreateFolderRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req schemas.CreateFolderRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
+	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
+		return nil, e
 	}
 	return req, nil
 }
@@ -238,8 +270,8 @@ func decodeGetFoldersByParentIDRequest(_ context.Context, r *http.Request) (inte
 
 func decodeUpdateFolderRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req schemas.UpdateFolderRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
+	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
+		return nil, e
 	}
 	return req, nil
 }
