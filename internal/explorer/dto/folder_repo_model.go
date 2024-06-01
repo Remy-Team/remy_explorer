@@ -5,7 +5,8 @@ package dto
 import (
 	"context"
 	"database/sql"
-	"remy_explorer/internal/explorer/domain"
+	"remy_explorer/internal/explorer/model"
+	"strconv"
 	"time"
 )
 
@@ -19,7 +20,7 @@ type FolderRepository interface {
 
 // FolderDTO is the data transfer object for the Folder entity in the database.
 type FolderDTO struct {
-	ID        string         `json:"id"`
+	ID        int            `json:"id"`
 	OwnerID   string         `json:"owner_id"`
 	Name      string         `json:"name"`
 	ParentID  sql.NullString `json:"parent_id"`
@@ -27,9 +28,9 @@ type FolderDTO struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 }
 
-func (m *FolderDTO) ToDomain() *domain.Folder {
-	return &domain.Folder{
-		ID:        m.ID,
+func (m *FolderDTO) ToDomain() *model.Folder {
+	return &model.Folder{
+		ID:        strconv.Itoa(m.ID),
 		OwnerID:   m.OwnerID,
 		Name:      m.Name,
 		ParentID:  m.ParentID.String,
@@ -38,9 +39,10 @@ func (m *FolderDTO) ToDomain() *domain.Folder {
 	}
 }
 
-func FolderToDTO(f *domain.Folder) *FolderDTO {
+func FolderToDTO(f *model.Folder) *FolderDTO {
+	id, _ := strconv.Atoi(f.ID) //TODO: rewrite
 	return &FolderDTO{
-		ID:        f.ID,
+		ID:        id,
 		OwnerID:   f.OwnerID,
 		Name:      f.Name,
 		ParentID:  sql.NullString{String: f.ParentID, Valid: true},

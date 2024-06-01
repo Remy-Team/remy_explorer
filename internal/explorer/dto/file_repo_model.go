@@ -4,7 +4,8 @@ package dto
 import (
 	"context"
 	"database/sql"
-	"remy_explorer/internal/explorer/domain"
+	"remy_explorer/internal/explorer/model"
+	"strconv"
 	"time"
 )
 
@@ -22,10 +23,10 @@ type FileRepository interface {
 
 // FileDTO is the data transfer object for the File entity in the database.
 type FileDTO struct {
-	ID         string           `json:"id"`
+	ID         int              `json:"id"`
 	OwnerID    string           `json:"owner_id"`
 	Name       string           `json:"name"`
-	FolderID   string           `json:"folder_id"`
+	FolderID   int              `json:"folder_id"`
 	ObjectPath sql.NullString   `json:"object_path"`
 	Size       int              `json:"size"`
 	Type       sql.NullString   `json:"type"`
@@ -34,16 +35,16 @@ type FileDTO struct {
 	Tags       []sql.NullString `json:"tags"`
 }
 
-func (d FileDTO) ToDomain() *domain.File {
+func (d FileDTO) ToDomain() *model.File {
 	tags := make([]string, 0)
 	for _, tag := range d.Tags {
 		tags = append(tags, tag.String)
 	}
-	return &domain.File{
-		ID:         d.ID,
+	return &model.File{
+		ID:         strconv.Itoa(d.ID),
 		OwnerID:    d.OwnerID,
 		Name:       d.Name,
-		FolderID:   d.FolderID,
+		FolderID:   strconv.Itoa(d.FolderID),
 		ObjectPath: d.ObjectPath.String,
 		Size:       d.Size,
 		Type:       d.Type.String,
@@ -54,16 +55,18 @@ func (d FileDTO) ToDomain() *domain.File {
 }
 
 // FileToDTO converts a File to a FileDTO.
-func FileToDTO(f *domain.File) FileDTO {
+func FileToDTO(f *model.File) FileDTO {
 	tags := make([]sql.NullString, 0)
 	for _, tag := range f.Tags {
 		tags = append(tags, sql.NullString{String: tag, Valid: true})
 	}
+	id, _ := strconv.Atoi(f.ID)         //TODO: rewrite
+	f_id, _ := strconv.Atoi(f.FolderID) //TODO: rewrite
 	return FileDTO{
-		ID:         f.ID,
+		ID:         id,
 		OwnerID:    f.OwnerID,
 		Name:       f.Name,
-		FolderID:   f.FolderID,
+		FolderID:   f_id,
 		ObjectPath: sql.NullString{String: f.ObjectPath, Valid: true},
 		Size:       f.Size,
 		Type:       sql.NullString{String: f.Type, Valid: true},
