@@ -14,7 +14,7 @@
 //	CONSTRAINT fk_file_folder_id FOREIGN KEY (folder_id) REFERENCES public.folder (id)
 //
 // );
-package domain
+package model
 
 import (
 	"time"

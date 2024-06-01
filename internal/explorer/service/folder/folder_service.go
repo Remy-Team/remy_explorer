@@ -2,17 +2,19 @@ package folder
 
 import (
 	"context"
+	"errors"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	"remy_explorer/internal/explorer/domain"
 	"remy_explorer/internal/explorer/dto"
+	modelerr "remy_explorer/internal/explorer/err"
+	"remy_explorer/internal/explorer/model"
 )
 
 type FolderService interface {
-	CreateFolder(ctx context.Context, folder *domain.Folder) (*string, error)
-	GetFolderByID(ctx context.Context, id string) (*domain.Folder, error)
-	GetFoldersByParentID(ctx context.Context, parentID string) ([]*domain.Folder, error)
-	UpdateFolder(ctx context.Context, folder *domain.Folder) error
+	CreateFolder(ctx context.Context, folder *model.Folder) (*string, error)
+	GetFolderByID(ctx context.Context, id string) (*model.Folder, error)
+	GetFoldersByParentID(ctx context.Context, parentID string) ([]*model.Folder, error)
+	UpdateFolder(ctx context.Context, folder *model.Folder) error
 	DeleteFolder(ctx context.Context, id string) error
 }
 
@@ -21,7 +23,7 @@ type service struct {
 	log  log.Logger
 }
 
-func (s service) CreateFolder(ctx context.Context, f *domain.Folder) (*string, error) {
+func (s service) CreateFolder(ctx context.Context, f *model.Folder) (*string, error) {
 	logger := log.With(s.log, "folder", "CreateFolder")
 	folderDTO := dto.FolderToDTO(f)
 	id, err := s.repo.CreateFolder(ctx, folderDTO)
@@ -33,10 +35,15 @@ func (s service) CreateFolder(ctx context.Context, f *domain.Folder) (*string, e
 	return id, nil
 }
 
-func (s service) GetFolderByID(ctx context.Context, id string) (*domain.Folder, error) {
+func (s service) GetFolderByID(ctx context.Context, id string) (*model.Folder, error) {
 	logger := log.With(s.log, "folder", "GetFolderByID")
 	folderDTO, err := s.repo.GetFolderByID(ctx, id)
 	if err != nil {
+		var errNotFound *modelerr.NotFound
+		if errors.As(err, &errNotFound) {
+			level.Info(logger).Log("err", err, "msg", "file not found")
+			return nil, err
+		}
 		level.Error(logger).Log("err", err)
 		return nil, err
 
@@ -45,14 +52,14 @@ func (s service) GetFolderByID(ctx context.Context, id string) (*domain.Folder, 
 	return folderDTO.ToDomain(), nil
 }
 
-func (s service) GetFoldersByParentID(ctx context.Context, parentID string) ([]*domain.Folder, error) {
+func (s service) GetFoldersByParentID(ctx context.Context, parentID string) ([]*model.Folder, error) {
 	logger := log.With(s.log, "folder", "GetFoldersByParentID")
 	folderDTOs, err := s.repo.GetFoldersByParentID(ctx, parentID)
 	if err != nil {
 		level.Error(logger).Log("err", err)
 		return nil, err
 	}
-	folders := make([]*domain.Folder, len(folderDTOs))
+	folders := make([]*model.Folder, len(folderDTOs))
 	for i, f := range folderDTOs {
 		folders[i] = f.ToDomain()
 	}
@@ -60,7 +67,7 @@ func (s service) GetFoldersByParentID(ctx context.Context, parentID string) ([]*
 	return folders, nil
 }
 
-func (s service) UpdateFolder(ctx context.Context, folder *domain.Folder) error {
+func (s service) UpdateFolder(ctx context.Context, folder *model.Folder) error {
 	logger := log.With(s.log, "folder", "UpdateFolder")
 	folderDTO := dto.FolderToDTO(folder)
 	if err := s.repo.UpdateFolder(ctx, folderDTO); err != nil {

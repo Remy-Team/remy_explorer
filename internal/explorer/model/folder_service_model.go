@@ -10,7 +10,7 @@
 //	CONSTRAINT fk_folder_parent_id FOREIGN KEY (parent_id) REFERENCES public.folder (id)
 //
 // );
-package domain
+package model
 
 import (
 	"time"
