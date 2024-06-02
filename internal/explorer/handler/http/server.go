@@ -136,6 +136,12 @@ func registerFolderRoutes(logger log.Logger, r *mux.Router, endpoints Endpoints)
 		decodeDeleteFolderRequest,
 		encodeResponse(logger),
 	))
+
+	r.Methods("GET").Path("/folders/{id}/content").Handler(httptransport.NewServer(
+		endpoints.GetFolderContent,
+		decodeGetFolderContent,
+		encodeResponse(logger),
+	))
 }
 
 // commonMiddleware adds common HTTP headers to all responses.
@@ -283,4 +289,13 @@ func decodeDeleteFolderRequest(_ context.Context, r *http.Request) (interface{},
 		return nil, errors.New("id is missing in parameters")
 	}
 	return schemas.DeleteFolderRequest{ID: id}, nil
+}
+
+func decodeGetFolderContent(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	ID, ok := vars["id"]
+	if !ok {
+		return nil, errors.New("FolderID is missing in parameters")
+	}
+	return schemas.GetFolderContentRequest{FolderID: ID}, nil
 }

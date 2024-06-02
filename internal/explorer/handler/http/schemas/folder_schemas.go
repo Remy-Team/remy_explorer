@@ -64,3 +64,13 @@ type DeleteFolderRequest struct {
 type DeleteFolderResponse struct {
 	Ok bool `json:"ok"` // Indicates whether the deletion was successful
 }
+
+type GetFolderContentRequest struct {
+	FolderID string `json:"folder_id"`
+}
+
+type GetFolderContentResponse struct {
+	Length  int               `json:"length"`
+	Folders []ShortFolderInfo `json:"folders"`
+	Files   []ShortFileInfo   `json:"files"`
+}

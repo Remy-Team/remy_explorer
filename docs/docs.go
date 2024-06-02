@@ -433,6 +433,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/folders/{id}/content": {
+            "get": {
+                "description": "Get files and folders inside folder",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folders"
+                ],
+                "summary": "Get folder content",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Folder ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.GetFolderContentResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/folders/{parentID}/subfolders": {
             "get": {
                 "description": "Retrieve a list of folders within a specific parent folder",
@@ -667,6 +711,26 @@ const docTemplate = `{
                 "updated_at": {
                     "description": "Timestamp when the folder was last updated",
                     "type": "string"
+                }
+            }
+        },
+        "schemas.GetFolderContentResponse": {
+            "type": "object",
+            "properties": {
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.ShortFileInfo"
+                    }
+                },
+                "folders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.ShortFolderInfo"
+                    }
+                },
+                "length": {
+                    "type": "integer"
                 }
             }
         },

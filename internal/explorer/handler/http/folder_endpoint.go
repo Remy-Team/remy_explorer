@@ -9,6 +9,7 @@ import (
 	modelerr "remy_explorer/internal/explorer/err"
 	"remy_explorer/internal/explorer/handler/http/schemas"
 	"remy_explorer/internal/explorer/model"
+	"remy_explorer/internal/explorer/service/file"
 	"remy_explorer/internal/explorer/service/folder"
 )
 
@@ -170,5 +171,57 @@ func makeDeleteFolderEndpoint(logger log.Logger, s folder.FolderService) endpoin
 		}
 		err := s.DeleteFolder(ctx, req.ID)
 		return schemas.DeleteFolderResponse{Ok: err == nil}, err
+	}
+}
+
+// makeGetFolderContent creates an endpoint for deleting a folder
+//
+//	@Summary		Get folder content
+//	@Description	Get files and folders inside folder
+//	@Tags			folders
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string	true	"Folder ID"
+//	@Success		200	{object}	schemas.GetFolderContentResponse
+//	@Failure		404	{object}	schemas.ErrorResponse
+//	@Failure		500	{object}	schemas.ErrorResponse
+//	@Router			/folders/{id}/content [get]
+func makeGetFolderContentEndpoint(logger log.Logger, s folder.FolderService, s2 file.FileService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		level.Info(logger).Log("msg", "entering makeGetFolderContentEndpoint", "request", request)
+		req, ok := request.(schemas.GetFolderContentRequest)
+		if !ok {
+			return nil, errors.New("invalid request type")
+		}
+
+		folderModels, err := s.GetFoldersByParentID(ctx, req.FolderID)
+		fileModels, err := s2.GetFilesByFolderID(ctx, req.FolderID)
+		if err != nil {
+			return nil, err
+		}
+		folderLength := len(folderModels)
+		folders := make([]schemas.ShortFolderInfo, 0, folderLength)
+		for _, f := range folderModels {
+			folders = append(folders, schemas.ShortFolderInfo{
+				ID:   f.ID,
+				Name: f.Name,
+			})
+		}
+
+		fileLength := len(fileModels)
+		files := make([]schemas.ShortFileInfo, 0, fileLength)
+		for _, f := range fileModels {
+			files = append(files, schemas.ShortFileInfo{
+				ID:   f.ID,
+				Name: f.Name,
+				Type: f.Type,
+			})
+		}
+
+		return schemas.GetFolderContentResponse{
+			Length:  folderLength + fileLength,
+			Folders: folders,
+			Files:   files,
+		}, nil
 	}
 }

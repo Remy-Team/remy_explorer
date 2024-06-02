@@ -21,6 +21,7 @@ type Endpoints struct {
 	GetFoldersByParentID endpoint.Endpoint
 	UpdateFolder         endpoint.Endpoint
 	DeleteFolder         endpoint.Endpoint
+	GetFolderContent     endpoint.Endpoint
 }
 
 // MakeEndpoints initializes all Go kit endpoints for file operations
@@ -37,5 +38,6 @@ func MakeEndpoints(logger log.Logger, fileS file.FileService, folderS folder.Fol
 		GetFoldersByParentID: makeGetFoldersByParentIDEndpoint(logger, folderS),
 		UpdateFolder:         makeUpdateFolderEndpoint(logger, folderS),
 		DeleteFolder:         makeDeleteFolderEndpoint(logger, folderS),
+		GetFolderContent:     makeGetFolderContentEndpoint(logger, folderS, fileS),
 	}
 }
