@@ -137,12 +137,12 @@ definitions:
     type: object
   schemas.GetFoldersByParentIDResponse:
     properties:
-      id:
-        description: ID of the folder
-        type: string
-      name:
-        description: Name of the folder
-        type: string
+      folders:
+        items:
+          $ref: '#/definitions/schemas.ShortFolderInfo'
+        type: array
+      length:
+        type: integer
     type: object
   schemas.ShortFileInfo:
     properties:
@@ -154,6 +154,15 @@ definitions:
         type: string
       type:
         description: Type of the file
+        type: string
+    type: object
+  schemas.ShortFolderInfo:
+    properties:
+      id:
+        description: ID of the folder
+        type: string
+      name:
+        description: Name of the folder
         type: string
     type: object
   schemas.UpdateFileRequest:
@@ -495,9 +504,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/schemas.GetFoldersByParentIDResponse'
-            type: array
+            $ref: '#/definitions/schemas.GetFoldersByParentIDResponse'
         "404":
           description: Not Found
           schema:

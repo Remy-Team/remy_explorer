@@ -459,10 +459,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/schemas.GetFoldersByParentIDResponse"
-                            }
+                            "$ref": "#/definitions/schemas.GetFoldersByParentIDResponse"
                         }
                     },
                     "404": {
@@ -676,13 +673,14 @@ const docTemplate = `{
         "schemas.GetFoldersByParentIDResponse": {
             "type": "object",
             "properties": {
-                "id": {
-                    "description": "ID of the folder",
-                    "type": "string"
+                "folders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.ShortFolderInfo"
+                    }
                 },
-                "name": {
-                    "description": "Name of the folder",
-                    "type": "string"
+                "length": {
+                    "type": "integer"
                 }
             }
         },
@@ -699,6 +697,19 @@ const docTemplate = `{
                 },
                 "type": {
                     "description": "Type of the file",
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.ShortFolderInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "ID of the folder",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name of the folder",
                     "type": "string"
                 }
             }
