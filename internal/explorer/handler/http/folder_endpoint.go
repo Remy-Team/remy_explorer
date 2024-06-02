@@ -6,7 +6,7 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	model_err "remy_explorer/internal/explorer/err"
+	modelerr "remy_explorer/internal/explorer/err"
 	"remy_explorer/internal/explorer/handler/http/schemas"
 	"remy_explorer/internal/explorer/model"
 	"remy_explorer/internal/explorer/service/folder"
@@ -62,7 +62,7 @@ func makeGetFolderByIDEndpoint(logger log.Logger, s folder.FolderService) endpoi
 		}
 		f, err := s.GetFolderByID(ctx, req.ID)
 		if err != nil {
-			var errNotFound *model_err.NotFound
+			var errNotFound *modelerr.NotFound
 			if errors.As(err, &errNotFound) {
 				return nil, err
 			}
@@ -88,29 +88,34 @@ func makeGetFolderByIDEndpoint(logger log.Logger, s folder.FolderService) endpoi
 //	@Accept			json
 //	@Produce		json
 //	@Param			parentID	path		string	true	"Parent Folder ID"
-//	@Success		200			{array}		schemas.GetFoldersByParentIDResponse
+//	@Success		200			{object}	schemas.GetFoldersByParentIDResponse
 //	@Failure		404			{object}	schemas.ErrorResponse
 //	@Failure		500			{object}	schemas.ErrorResponse
 //	@Router			/folders/{parentID}/subfolders [get]
 func makeGetFoldersByParentIDEndpoint(logger log.Logger, s folder.FolderService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		level.Info(logger).Log("msg", "entering  makeGetFoldersByParentIDEndpoint", "request", request)
+		level.Info(logger).Log("msg", "entering makeGetFoldersByParentIDEndpoint", "request", request)
 		req, ok := request.(schemas.GetFoldersByParentIDRequest)
 		if !ok {
 			return nil, errors.New("invalid request type")
 		}
+
 		folders, err := s.GetFoldersByParentID(ctx, req.ParentID)
 		if err != nil {
 			return nil, err
 		}
-		var res []schemas.GetFoldersByParentIDResponse
+		length := len(folders)
+		res := make([]schemas.ShortFolderInfo, 0, length)
 		for _, f := range folders {
-			res = append(res, schemas.GetFoldersByParentIDResponse{
+			res = append(res, schemas.ShortFolderInfo{
 				ID:   f.ID,
 				Name: f.Name,
 			})
 		}
-		return res, nil
+		return schemas.GetFoldersByParentIDResponse{
+			Length:  length,
+			Folders: res,
+		}, nil
 	}
 }
 

@@ -80,7 +80,7 @@ func registerFileRoutes(logger log.Logger, r *mux.Router, endpoints Endpoints) {
 		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 
-	r.Methods("GET").Path("/files").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/folders/{folderID}/files").Handler(httptransport.NewServer(
 		endpoints.GetFilesByParentID,
 		decodeGetFilesByParentIDRequest,
 		encodeResponse(logger),
@@ -117,7 +117,7 @@ func registerFolderRoutes(logger log.Logger, r *mux.Router, endpoints Endpoints)
 		httptransport.ServerErrorEncoder(encodeErrorResponse(logger)),
 	))
 
-	r.Methods("GET").Path("/folders/{parent_id}/subfolders").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/folders/{parentID}/subfolders").Handler(httptransport.NewServer(
 		endpoints.GetFoldersByParentID,
 		decodeGetFoldersByParentIDRequest,
 		encodeResponse(logger),
@@ -226,7 +226,7 @@ func decodeGetFileByIDRequest(_ context.Context, r *http.Request) (interface{}, 
 
 func decodeGetFilesByParentIDRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
-	parentID, ok := vars["parentID"]
+	parentID, ok := vars["folderID"]
 	if !ok {
 		return nil, errors.New("parentID is missing in parameters")
 	}

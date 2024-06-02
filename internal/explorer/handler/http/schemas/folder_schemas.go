@@ -32,10 +32,15 @@ type GetFoldersByParentIDRequest struct {
 	ParentID string `json:"parent_id" validate:"required"` // ID of the parent folder
 }
 
-// GetFoldersByParentIDResponse represents the response with the list of folders within a specific parent folder
-type GetFoldersByParentIDResponse struct {
+type ShortFolderInfo struct {
 	ID   string `json:"id"`   // ID of the folder
 	Name string `json:"name"` // Name of the folder
+}
+
+// GetFoldersByParentIDResponse represents the response with the list of folders within a specific parent folder
+type GetFoldersByParentIDResponse struct {
+	Length  int               `json:"length"`
+	Folders []ShortFolderInfo `json:"folders"`
 }
 
 // UpdateFolderRequest represents the request to update a folder

@@ -62,6 +62,10 @@ func (r folderRepository) GetFolderByID(ctx context.Context, id string) (*model.
 
 // GetFoldersByParentID retrieves all folders with a given parent ID.
 func (r folderRepository) GetFoldersByParentID(ctx context.Context, FolderID string) ([]*model.FolderDTO, error) {
+	_, err := r.GetFolderByID(ctx, FolderID)
+	if err != nil {
+		return nil, err
+	}
 	q := `SELECT id, owner_id, name, parent_id, created_at, updated_at FROM public.folder WHERE parent_id = $1`
 	rows, err := r.client.Query(ctx, q, FolderID)
 	if err != nil {
@@ -73,7 +77,6 @@ func (r folderRepository) GetFoldersByParentID(ctx context.Context, FolderID str
 		return nil, err
 	}
 	defer rows.Close()
-
 	var folders []*model.FolderDTO
 	for rows.Next() {
 		var f model.FolderDTO
